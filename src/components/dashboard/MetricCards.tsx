@@ -5,18 +5,16 @@ import { formatCurrency, formatNumber } from '../../utils/formatters';
 interface MetricCardProps {
   title: string;
   count: number;
-  gmv: number;
-  commission: number;
   color: string;
   icon?: ReactNode;
 }
 
-export function StatusMetricCard({ title, count, gmv, commission, color, icon }: MetricCardProps) {
+export function StatusMetricCard({ title, count, color, icon }: MetricCardProps) {
   const colorMap: Record<string, string> = {
-    yellow: 'border-status-pending text-status-pending',
-    blue: 'border-status-awaiting text-status-awaiting',
-    red: 'border-status-ineligible text-status-ineligible',
-    green: 'border-status-settled text-status-settled',
+    yellow: 'text-status-pending',
+    blue: 'text-status-awaiting',
+    red: 'text-status-ineligible',
+    green: 'text-status-settled',
   };
 
   const bgMap: Record<string, string> = {
@@ -27,27 +25,19 @@ export function StatusMetricCard({ title, count, gmv, commission, color, icon }:
   };
 
   return (
-    <div className="bg-card p-5 rounded-[18px] border border-border-main shadow-soft flex flex-col space-y-4">
-      <div className="flex items-center space-x-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${bgMap[color]} ${colorMap[color].split(' ')[1]}`}>
+    <div className="bg-card p-3.5 rounded-[20px] border border-border-main shadow-sm flex flex-col gap-3 transition-all hover:shadow-md hover:border-primary/20 group h-full">
+      <div className="flex items-center gap-2 min-w-0">
+        <div className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center ${bgMap[color]} ${colorMap[color]} transition-transform group-hover:scale-105`}>
           {icon}
         </div>
-        <span className="text-[13px] font-semibold text-text-secondary">{title}</span>
+        <p className="text-[11px] sm:text-[12px] uppercase font-bold text-text-tertiary tracking-wider leading-tight whitespace-pre-line">
+          {title}
+        </p>
       </div>
-
-      <div className="space-y-1">
-        <p className="text-2xl font-bold text-text-main">{formatNumber(count)} pedidos</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border-main">
-        <div>
-          <p className="text-[10px] uppercase font-bold text-text-tertiary tracking-wider">GMV</p>
-          <p className="text-sm font-bold text-text-main truncate">{formatCurrency(gmv)}</p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase font-bold text-text-tertiary tracking-wider">Comissão</p>
-          <p className="text-sm font-bold text-text-main truncate">{formatCurrency(commission)}</p>
-        </div>
+      
+      <div className="flex items-baseline gap-1 mt-auto">
+        <p className="text-2xl font-black text-text-main leading-none">{formatNumber(count)}</p>
+        <span className="text-[12px] font-medium text-text-tertiary truncate">pedidos</span>
       </div>
     </div>
   );

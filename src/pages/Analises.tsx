@@ -1,53 +1,46 @@
-import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useDashboardData } from '../hooks/useDashboardData';
-import { PeriodFilter } from '../components/dashboard/PeriodFilter';
+import { 
+  useContentTypeComparison, 
+  useTrafficSourceComparison, 
+  useTopProducts,
+  useDashboardSummary
+} from '../hooks/useDashboard';
+import { PeriodFilter } from '../components/filters/PeriodFilter';
 import { 
   Package, 
-  TrendingUp, 
-  ShoppingCart, 
-  DollarSign,
-  ChevronRight,
   Medal
 } from 'lucide-react';
 import { 
-  formatCurrency, 
-  formatNumber,
-  getPresetDateKeys,
-  formatDateRangeLabel
+  formatCurrency
 } from '../utils/formatters';
-import { Calendar } from 'lucide-react';
 
 export default function Analises() {
-  const [dateRange, setDateRange] = useState(() => getPresetDateKeys('last30days'));
-  
-  const { data, loading } = useDashboardData(dateRange.startDateKey, dateRange.endDateKey);
+  const { data: summary, isLoading: summaryLoading, isFetching: summaryFetching } = useDashboardSummary();
+  const { data: contentComparison, isLoading: contentLoading, isFetching: contentFetching } = useContentTypeComparison();
+  const { data: trafficComparison, isLoading: trafficLoading, isFetching: trafficFetching } = useTrafficSourceComparison();
+  const { data: topProducts, isLoading: topProductsLoading, isFetching: topProductsFetching } = useTopProducts();
 
-  const handlePeriodChange = (startDateKey: string, endDateKey: string) => {
-    setDateRange({ startDateKey, endDateKey });
-  };
+  const loading = summaryLoading || contentLoading || trafficLoading || topProductsLoading;
+  const isFetching = summaryFetching || contentFetching || trafficFetching || topProductsFetching;
 
-  if (loading || !data) {
+  if (loading && !summary) {
     return <div className="animate-pulse space-y-8"><div className="h-40 bg-card rounded-2xl"></div></div>;
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Background Fetching Indicator */}
+      {isFetching && !loading && (
+        <div className="fixed top-0 left-0 right-0 z-[60] h-1">
+          <div className="h-full bg-primary animate-[loading_1s_ease-in-out_infinite] origin-left"></div>
+        </div>
+      )}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold text-text-main tracking-tight">Análises</h1>
         <p className="text-text-secondary text-sm">Mergulhe nos detalhes do seu desempenho.</p>
       </div>
 
-      <div className="space-y-4">
-        <PeriodFilter onPeriodChange={handlePeriodChange} defaultPeriod="last30days" />
-        <div className="flex items-center space-x-2 text-xs text-text-secondary">
-          <Calendar size={12} className="text-text-tertiary" />
-          <span>Exibindo:</span>
-          <span className="font-semibold text-text-primary">
-            {formatDateRangeLabel(dateRange.startDateKey, dateRange.endDateKey)}
-          </span>
-        </div>
-      </div>
+      {/* Period Filter */}
+      <PeriodFilter />
 
       {/* Video vs Live */}
       <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
@@ -57,7 +50,7 @@ export default function Analises() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {Object.entries(data.contentComparison).map(([type, stats]) => (
+          {Object.entries(contentComparison || {}).map(([type, stats]: [string, any]) => (
             <div key={type} className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold capitalize text-text-secondary">{type}</span>
@@ -66,7 +59,7 @@ export default function Analises() {
               <div className="w-full h-2 bg-background-secondary rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${type === 'video' ? 'bg-primary' : type === 'live' ? 'bg-status-commission' : 'bg-text-tertiary'}`} 
-                  style={{ width: `${(stats.gmv / data.gmvTotal) * 100}%` }}
+                  style={{ width: `${summary.gmvTotal > 0 ? (stats.gmv / summary.gmvTotal) * 100 : 0}%` }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs">
@@ -82,7 +75,7 @@ export default function Analises() {
       <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
         <h3 className="font-bold text-text-main">Orgânico vs Anúncios</h3>
         <div className="space-y-6">
-          {Object.entries(data.trafficComparison).map(([source, stats]) => (
+          {Object.entries(trafficComparison || {}).map(([source, stats]: [string, any]) => (
             <div key={source} className="flex items-center space-x-4">
               <div className="w-24 text-xs font-bold text-text-secondary capitalize">
                 {source === 'shop_ads' ? 'Anúncios' : source === 'organic' ? 'Orgânico' : 'Outros'}
@@ -90,11 +83,11 @@ export default function Analises() {
               <div className="flex-1 h-3 bg-background-secondary rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${source === 'shop_ads' ? 'bg-status-awaiting' : source === 'organic' ? 'bg-status-settled' : 'bg-text-tertiary'}`} 
-                  style={{ width: `${(stats.gmv / data.gmvTotal) * 100}%` }}
+                  style={{ width: `${summary.gmvTotal > 0 ? (stats.gmv / summary.gmvTotal) * 100 : 0}%` }}
                 ></div>
               </div>
               <div className="w-24 text-right text-xs font-bold text-text-main">
-                {((stats.gmv / data.gmvTotal) * 100).toFixed(1)}%
+                {summary.gmvTotal > 0 ? ((stats.gmv / summary.gmvTotal) * 100).toFixed(1) : 0}%
               </div>
             </div>
           ))}
@@ -105,7 +98,7 @@ export default function Analises() {
       <div className="space-y-4">
         <h3 className="font-bold text-text-main text-lg tracking-tight">Produtos mais vendidos</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {data.topProducts.slice(0, 3).map((product, index) => (
+          {(topProducts || []).slice(0, 3).map((product: any, index: number) => (
             <div key={product.id} className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-4 relative overflow-hidden group">
               <div className={`absolute -right-2 -top-2 w-16 h-16 opacity-10 flex items-center justify-center rotate-12 transition-transform group-hover:scale-110`}>
                 <Medal size={64} />

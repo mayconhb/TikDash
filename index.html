@@ -7,8 +7,8 @@
   </head>
   <body>
     <script>
-      // Shim global to avoid read-only fetch error in polyfills
-      window.global = Object.create(window);
+      // Fix for 'global' being expected by some libraries and avoid read-only property issues
+      window.global = window;
     </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { PeriodFilterProvider } from './contexts/PeriodFilterContext';
 import { ProtectedRoute } from './components/navigation/ProtectedRoute';
 import { AppShell } from './components/layout/AppShell';
 
@@ -17,11 +19,21 @@ import Configuracoes from './pages/Configuracoes';
 import Onboarding from './pages/Onboarding';
 import Offline from './pages/Offline';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Register />} />
@@ -32,53 +44,67 @@ export default function App() {
           {/* Protected Routes */}
           <Route path="/" element={
             <ProtectedRoute>
-              <Navigate to="/dashboard" replace />
+              <PeriodFilterProvider>
+                <Navigate to="/dashboard" replace />
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/onboarding" element={
             <ProtectedRoute>
-              <Onboarding />
+              <PeriodFilterProvider>
+                <Onboarding />
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <AppShell>
-                <Dashboard />
-              </AppShell>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <Dashboard />
+                </AppShell>
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/analises" element={
             <ProtectedRoute>
-              <AppShell>
-                <Analises />
-              </AppShell>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <Analises />
+                </AppShell>
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/relatorio-diario" element={
             <ProtectedRoute>
-              <AppShell>
-                <RelatorioDiario />
-              </AppShell>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <RelatorioDiario />
+                </AppShell>
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/importacoes" element={
             <ProtectedRoute>
-              <AppShell>
-                <Importacoes />
-              </AppShell>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <Importacoes />
+                </AppShell>
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
           <Route path="/configuracoes" element={
             <ProtectedRoute>
-              <AppShell>
-                <Configuracoes />
-              </AppShell>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <Configuracoes />
+                </AppShell>
+              </PeriodFilterProvider>
             </ProtectedRoute>
           } />
 
@@ -89,5 +115,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  </QueryClientProvider>
   );
 }

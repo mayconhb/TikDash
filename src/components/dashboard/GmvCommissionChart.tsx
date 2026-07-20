@@ -11,14 +11,15 @@ import {
   ComposedChart,
   Legend
 } from 'recharts';
-import { formatCurrency, formatNumber, formatDateKeyShort } from '../../utils/formatters';
+import { formatCurrency, formatNumber } from '../../utils/formatters';
+import { formatDateKeyShort } from '../../lib/date-range';
 
 interface GmvCommissionChartProps {
   data: { date: string; gmv: number; commission: number }[];
 }
 
-export function GmvCommissionChart({ data }: GmvCommissionChartProps) {
-  const formattedData = data.map(item => ({
+export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
+  const formattedData = (data || []).map(item => ({
     ...item,
     dateFormatted: formatDateKeyShort(item.date),
   }));

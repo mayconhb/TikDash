@@ -1,8 +1,4 @@
 import { 
-  addDays,
-  subDays,
-  startOfDay,
-  endOfDay,
   format,
   parse,
 } from 'date-fns';
@@ -13,107 +9,6 @@ export const APP_TIME_ZONE = 'America/Sao_Paulo';
 
 export function getNowInAppTimeZone(): Date {
   return toZonedTime(new Date(), APP_TIME_ZONE);
-}
-
-export function getTodayDateKey(): string {
-  const nowInSaoPaulo = getNowInAppTimeZone();
-  return format(nowInSaoPaulo, 'yyyy-MM-dd');
-}
-
-export function getYesterdayDateKey(): string {
-  const nowInSaoPaulo = getNowInAppTimeZone();
-  const yesterdayInSaoPaulo = subDays(nowInSaoPaulo, 1);
-  return format(yesterdayInSaoPaulo, 'yyyy-MM-dd');
-}
-
-export interface UtcDateRange {
-  startUtc: string;
-  endUtc: string;
-  startDateKey: string;
-  endDateKey: string;
-}
-
-function parseDateKeyAsLocalCalendarDate(dateKey: string): Date {
-  return parse(dateKey, 'yyyy-MM-dd', new Date());
-}
-
-export function createUtcRangeFromDateKeys(
-  startDateKey: string,
-  endDateKey: string,
-): UtcDateRange {
-  const startCalendarDate = parseDateKeyAsLocalCalendarDate(startDateKey);
-  const endCalendarDate = parseDateKeyAsLocalCalendarDate(endDateKey);
-
-  const startWallClock = startOfDay(startCalendarDate);
-  const endWallClock = endOfDay(endCalendarDate);
-
-  const startUtcDate = fromZonedTime(startWallClock, APP_TIME_ZONE);
-  const endUtcDate = fromZonedTime(endWallClock, APP_TIME_ZONE);
-
-  return {
-    startUtc: startUtcDate.toISOString(),
-    endUtc: endUtcDate.toISOString(),
-    startDateKey,
-    endDateKey,
-  };
-}
-
-export type PeriodPreset = 'today' | 'yesterday' | 'last7days' | 'last30days' | 'custom';
-
-export function getPresetDateKeys(
-  preset: Exclude<PeriodPreset, 'custom'>,
-): {
-  startDateKey: string;
-  endDateKey: string;
-} {
-  const nowInSaoPaulo = getNowInAppTimeZone();
-
-  if (preset === 'today') {
-    const today = format(nowInSaoPaulo, 'yyyy-MM-dd');
-    return { startDateKey: today, endDateKey: today };
-  }
-
-  if (preset === 'yesterday') {
-    const yesterday = format(subDays(nowInSaoPaulo, 1), 'yyyy-MM-dd');
-    return { startDateKey: yesterday, endDateKey: yesterday };
-  }
-
-  if (preset === 'last7days') {
-    return {
-      startDateKey: format(subDays(nowInSaoPaulo, 6), 'yyyy-MM-dd'),
-      endDateKey: format(nowInSaoPaulo, 'yyyy-MM-dd'),
-    };
-  }
-
-  return {
-    startDateKey: format(subDays(nowInSaoPaulo, 29), 'yyyy-MM-dd'),
-    endDateKey: format(nowInSaoPaulo, 'yyyy-MM-dd'),
-  };
-}
-
-export function formatDateKeyPtBr(dateKey: string): string {
-  const date = parse(dateKey, 'yyyy-MM-dd', new Date());
-  return format(date, 'dd/MM/yyyy');
-}
-
-export function formatDateKeyDayMonth(dateKey: string): string {
-  const date = parse(dateKey, 'yyyy-MM-dd', new Date());
-  return format(date, 'dd/MM');
-}
-
-export function formatDateKeyShort(dateKey: string): string {
-  const date = parse(dateKey, 'yyyy-MM-dd', new Date());
-  return format(date, "dd 'de' MMM", { locale: ptBR });
-}
-
-export function formatDateRangeLabel(
-  startDateKey: string,
-  endDateKey: string,
-): string {
-  if (startDateKey === endDateKey) {
-    return formatDateKeyPtBr(startDateKey);
-  }
-  return `${formatDateKeyPtBr(startDateKey)} até ${formatDateKeyPtBr(endDateKey)}`;
 }
 
 export function parseTikTokOrderDate(rawValue: string): Date {

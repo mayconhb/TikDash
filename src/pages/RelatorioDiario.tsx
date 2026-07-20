@@ -1,39 +1,39 @@
 import { useState } from 'react';
-import { useDashboardData } from '../hooks/useDashboardData';
-import { PeriodFilter } from '../components/dashboard/PeriodFilter';
+import { useDailyReport } from '../hooks/useDashboard';
+import { PeriodFilter } from '../components/filters/PeriodFilter';
 import { 
   formatCurrency, 
   formatNumber, 
-  getPresetDateKeys,
-  formatDateKeyDayMonth,
-  formatDateKeyPtBr,
-  formatDateRangeLabel,
   formatPercent
 } from '../utils/formatters';
 import { 
+  formatDateKeyDayMonth,
+  formatDateKeyPtBr
+} from '../lib/date-range';
+import { 
   Table as TableIcon,
-  LayoutGrid,
-  Calendar
+  LayoutGrid
 } from 'lucide-react';
 
 export default function RelatorioDiario() {
-  const [dateRange, setDateRange] = useState(() => getPresetDateKeys('last30days'));
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
-  const { data, loading } = useDashboardData(dateRange.startDateKey, dateRange.endDateKey);
+  const { data: dailyData, isLoading: loading, isFetching } = useDailyReport();
 
-  const handlePeriodChange = (startDateKey: string, endDateKey: string) => {
-    setDateRange({ startDateKey, endDateKey });
-  };
-
-  if (loading || !data) {
+  if (loading && !dailyData) {
     return <div className="animate-pulse space-y-8"><div className="h-64 bg-card rounded-2xl"></div></div>;
   }
 
-  const sortedData = [...data.timeSeries].reverse();
+  const sortedData = [...(dailyData || [])];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Background Fetching Indicator */}
+      {isFetching && !loading && (
+        <div className="fixed top-0 left-0 right-0 z-[60] h-1">
+          <div className="h-full bg-primary animate-[loading_1s_ease-in-out_infinite] origin-left"></div>
+        </div>
+      )}
       <div className="flex justify-between items-end">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-text-main tracking-tight">Relatório diário</h1>
@@ -57,16 +57,8 @@ export default function RelatorioDiario() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <PeriodFilter onPeriodChange={handlePeriodChange} defaultPeriod="last30days" />
-        <div className="flex items-center space-x-2 text-xs text-text-secondary">
-          <Calendar size={12} className="text-text-tertiary" />
-          <span>Exibindo:</span>
-          <span className="font-semibold text-text-primary">
-            {formatDateRangeLabel(dateRange.startDateKey, dateRange.endDateKey)}
-          </span>
-        </div>
-      </div>
+      {/* Period Filter */}
+      <PeriodFilter />
 
       <div className="hidden md:block bg-card rounded-[18px] border border-border-main shadow-soft overflow-hidden">
         <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
@@ -84,40 +76,45 @@ export default function RelatorioDiario() {
               </tr>
             </thead>
             <tbody>
-              {sortedData.map((day) => (
-                <tr key={day.date} className="border-b border-border-main hover:bg-background-secondary/30 transition-colors">
-                  <td className="px-6 py-4 text-sm font-bold text-text-main">
-                    {formatDateKeyDayMonth(day.date)}
-                  </td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
-                    {formatNumber(day.settledCount)}
-                  </td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
-                    {formatNumber(day.pendingCount)}
-                  </td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
-                    {formatNumber(day.awaitingCount)}
-                  </td>
-                  <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
-                    {formatNumber(day.ineligibleCount)}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-bold text-text-main">
-                    {formatCurrency(day.gmv)}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-bold text-status-commission">
-                    {formatCurrency(day.commission)}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      day.unexploitedPercentage > 10 ? 'bg-red-100 text-red-600' : 
-                      day.unexploitedPercentage > 5 ? 'bg-amber-100 text-amber-600' : 
-                      'bg-emerald-100 text-emerald-600'
-                    }`}>
-                      {formatPercent(day.unexploitedPercentage)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {sortedData.map((day) => {
+                const unexploited = day.awaiting + day.ineligible;
+                const unexploitedPercentage = day.commission > 0 ? (unexploited / day.commission) * 100 : 0;
+                
+                return (
+                  <tr key={day.date} className="border-b border-border-main hover:bg-background-secondary/30 transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-text-main">
+                      {formatDateKeyDayMonth(day.date)}
+                    </td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
+                      {formatNumber(day.settled)}
+                    </td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
+                      {formatNumber(day.pending)}
+                    </td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
+                      {formatNumber(day.awaiting)}
+                    </td>
+                    <td className="px-4 py-4 text-center text-sm font-medium text-text-secondary">
+                      {formatNumber(day.ineligible)}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm font-bold text-text-main">
+                      {formatCurrency(day.gmv)}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm font-bold text-status-commission">
+                      {formatCurrency(day.commission)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                        unexploitedPercentage > 10 ? 'bg-red-100 text-red-600' : 
+                        unexploitedPercentage > 5 ? 'bg-amber-100 text-amber-600' : 
+                        'bg-emerald-100 text-emerald-600'
+                      }`}>
+                        {formatPercent(unexploitedPercentage)}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -125,57 +122,62 @@ export default function RelatorioDiario() {
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
-        {sortedData.map((day) => (
-          <div key={day.date} className="bg-card rounded-[18px] border border-border-main shadow-soft p-5 space-y-4">
-            <div className="flex justify-between items-center border-b border-border-main pb-3">
-              <span className="text-base font-bold text-text-main">{formatDateKeyPtBr(day.date)}</span>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                day.unexploitedPercentage > 10 ? 'bg-red-100 text-red-600' : 
-                day.unexploitedPercentage > 5 ? 'bg-amber-100 text-amber-600' : 
-                'bg-emerald-100 text-emerald-600'
-              }`}>
-                {formatPercent(day.unexploitedPercentage)}
-              </span>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-text-tertiary">Liquidados</span>
-                <span className="font-bold text-text-main">{formatNumber(day.settledCount)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-tertiary">Pendentes</span>
-                <span className="font-bold text-text-main">{formatNumber(day.pendingCount)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-tertiary">Aguardando</span>
-                <span className="font-bold text-text-main">{formatNumber(day.awaitingCount)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-tertiary">Inelegíveis</span>
-                <span className="font-bold text-text-main">{formatNumber(day.ineligibleCount)}</span>
-              </div>
-              <div className="flex justify-between text-sm pt-2 border-t border-border-main">
-                <span className="text-text-tertiary">GMV</span>
-                <span className="font-bold text-text-main">{formatCurrency(day.gmv)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-tertiary">Comissão</span>
-                <span className="font-bold text-status-commission">{formatCurrency(day.commission)}</span>
-              </div>
-              <div className="flex flex-col pt-2">
-                <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Comissão não aproveitada</span>
-                <span className={`text-lg font-black ${
-                  day.unexploitedPercentage > 10 ? 'text-red-600' : 
-                  day.unexploitedPercentage > 5 ? 'text-amber-600' : 
-                  'text-emerald-600'
+        {sortedData.map((day) => {
+          const unexploited = day.awaiting + day.ineligible;
+          const unexploitedPercentage = day.commission > 0 ? (unexploited / day.commission) * 100 : 0;
+          
+          return (
+            <div key={day.date} className="bg-card rounded-[18px] border border-border-main shadow-soft p-5 space-y-4">
+              <div className="flex justify-between items-center border-b border-border-main pb-3">
+                <span className="text-base font-bold text-text-main">{formatDateKeyPtBr(day.date)}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                  unexploitedPercentage > 10 ? 'bg-red-100 text-red-600' : 
+                  unexploitedPercentage > 5 ? 'bg-amber-100 text-amber-600' : 
+                  'bg-emerald-100 text-emerald-600'
                 }`}>
-                  {formatPercent(day.unexploitedPercentage)}
+                  {formatPercent(unexploitedPercentage)}
                 </span>
               </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-tertiary">Liquidados</span>
+                  <span className="font-bold text-text-main">{formatNumber(day.settled)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-tertiary">Pendentes</span>
+                  <span className="font-bold text-text-main">{formatNumber(day.pending)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-tertiary">Aguardando</span>
+                  <span className="font-bold text-text-main">{formatNumber(day.awaiting)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-tertiary">Inelegíveis</span>
+                  <span className="font-bold text-text-main">{formatNumber(day.ineligible)}</span>
+                </div>
+                <div className="flex justify-between text-sm pt-2 border-t border-border-main">
+                  <span className="text-text-tertiary">GMV</span>
+                  <span className="font-bold text-text-main">{formatCurrency(day.gmv)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-tertiary">Comissão</span>
+                  <span className="font-bold text-status-commission">{formatCurrency(day.commission)}</span>
+                </div>
+                <div className="flex flex-col pt-2">
+                  <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Comissão não aproveitada</span>
+                  <span className={`text-lg font-black ${
+                    unexploitedPercentage > 10 ? 'text-red-600' : 
+                    unexploitedPercentage > 5 ? 'text-amber-600' : 
+                    'text-emerald-600'
+                  }`}>
+                    {formatPercent(unexploitedPercentage)}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

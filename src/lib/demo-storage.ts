@@ -18,7 +18,7 @@ export const demoStorage = {
     return record;
   },
 
-  getRows: (userId: string, startUtc: string, endUtc: string): AffiliateOrderRow[] => {
+  getRows: (userId: string, startUtc: string, endUtcExclusive: string): AffiliateOrderRow[] => {
     const data = localStorage.getItem(STORAGE_KEYS.ROWS);
     if (!data) return [];
     
@@ -26,7 +26,7 @@ export const demoStorage = {
     return rows.filter(row => {
       return row.user_id === userId && 
              row.order_date >= startUtc && 
-             row.order_date <= endUtc;
+             row.order_date < endUtcExclusive;
     });
   },
 
