@@ -37,7 +37,7 @@ export function PeriodFilter({ onPeriodChange, defaultPeriod = 'last30days' }: P
   ];
 
   return (
-    <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
+    <div className="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
       {options.map((opt) => (
         <button
           key={opt.id}

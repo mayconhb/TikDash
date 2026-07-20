@@ -40,8 +40,7 @@ export default defineConfig(() => {
       },
     },
     define: {
-      // Some libraries expect 'global' to exist in the browser
-      global: 'window',
+      // Avoid defining global as window as it can trigger problematic polyfills
     },
     build: {
       target: 'esnext',

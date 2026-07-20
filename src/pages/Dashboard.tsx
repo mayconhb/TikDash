@@ -69,7 +69,7 @@ export default function Dashboard() {
         </div>
         <Link 
           to="/importacoes" 
-          className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all active:scale-[0.98]"
+          className="hidden md:inline-block bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all active:scale-[0.98]"
         >
           Importar planilha
         </Link>
@@ -86,16 +86,16 @@ export default function Dashboard() {
             {getGreeting()}, {profile?.name?.split(' ')[0]}
           </h1>
           <p className="text-text-secondary text-sm">Veja como estão suas vendas.</p>
-        </div>
-        <div className="flex flex-col items-end space-y-1">
           {data.lastUpdate && (
             <p className="text-[10px] text-text-tertiary font-medium">
               Atualizado {formatDateTime(data.lastUpdate)}
             </p>
           )}
+        </div>
+        <div className="flex flex-col items-end">
           <Link 
             to="/importacoes" 
-            className="flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary/20 transition-colors"
+            className="hidden md:flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary/20 transition-colors"
           >
             <Plus size={16} />
             <span>Importar planilha</span>
