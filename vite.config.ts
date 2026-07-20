@@ -36,8 +36,16 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(__dirname, './src'),
       },
+    },
+    define: {
+      // Some libraries expect 'global' to exist in the browser
+      global: 'window',
+    },
+    build: {
+      target: 'esnext',
+      sourcemap: true,
     },
     server: {
       port: 3000,
