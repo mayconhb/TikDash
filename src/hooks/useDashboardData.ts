@@ -60,20 +60,43 @@ export function useDashboardData(startDateKey: string, endDateKey: string) {
         let hasAnyData = false;
 
         const range = createUtcRangeFromDateKeys(startDateKey, endDateKey);
+        let lastUpdate: string | Date | null = null;
 
         if (isDemo) {
           const allImports = demoStorage.getImports();
           hasAnyData = allImports.length > 0;
           rows = demoStorage.getRows(user.id, range.startUtc, range.endUtc);
-        } else {
-          // Check if has any data at all
-          const { count, error: countError } = await supabase
-            .from('imports')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', user?.id);
           
-          if (!countError) {
-            hasAnyData = (count || 0) > 0;
+          if (hasAnyData) {
+            const lastImport = allImports.sort((a, b) => 
+              new Date(b.completed_at || b.created_at).getTime() - new Date(a.completed_at || a.created_at).getTime()
+            )[0];
+            lastUpdate = lastImport.completed_at || lastImport.created_at;
+          }
+        } else {
+          // Check if has any data and get last update
+          const { data: lastImportData, error: lastImportError } = await supabase
+            .from('imports')
+            .select('completed_at, created_at')
+            .eq('user_id', user?.id)
+            .in('status', ['completed', 'completed_with_warnings'])
+            .order('completed_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          if (!lastImportError && lastImportData) {
+            hasAnyData = true;
+            lastUpdate = lastImportData.completed_at || lastImportData.created_at;
+          } else {
+            // Fallback to check if has any import at all even if not completed
+            const { count, error: countError } = await supabase
+              .from('imports')
+              .select('*', { count: 'exact', head: true })
+              .eq('user_id', user?.id);
+            
+            if (!countError) {
+              hasAnyData = (count || 0) > 0;
+            }
           }
 
           const { data: fetchRows, error: fetchError } = await supabase
@@ -114,7 +137,7 @@ export function useDashboardData(startDateKey: string, endDateKey: string) {
           topProducts: [],
           salesByHour: Array.from({ length: 24 }, (_, i) => ({ hour: i, orders: 0, gmv: 0, commission: 0 })),
           salesByWeekday: Array.from({ length: 7 }, (_, i) => ({ day: i, orders: 0, gmv: 0, commission: 0 })),
-          lastUpdate: rows && rows.length > 0 ? rows[rows.length - 1].updated_at : null,
+          lastUpdate,
           hasAnyData,
         };
 

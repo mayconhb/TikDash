@@ -116,7 +116,12 @@ export default function Dashboard() {
       </div>
 
       {/* Summary Card */}
-      <SummaryCard gmv={data.gmvTotal} commission={data.commissionTotal} />
+      <SummaryCard 
+        gmvTotal={data.ordersByStatus.pending.gmv + data.ordersByStatus.awaiting_payment.gmv + data.ordersByStatus.ineligible.gmv} 
+        commissionTotal={data.ordersByStatus.pending.commission + data.ordersByStatus.awaiting_payment.commission + data.ordersByStatus.ineligible.commission}
+        gmvReal={data.ordersByStatus.pending.gmv}
+        commissionReal={data.ordersByStatus.pending.commission}
+      />
 
       {/* Status Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

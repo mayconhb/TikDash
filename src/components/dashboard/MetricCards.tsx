@@ -53,28 +53,62 @@ export function StatusMetricCard({ title, count, gmv, commission, color, icon }:
   );
 }
 
-export function SummaryCard({ gmv, commission }: { gmv: number; commission: number }) {
+export function SummaryCard({ 
+  gmvTotal, 
+  commissionTotal, 
+  gmvReal, 
+  commissionReal 
+}: { 
+  gmvTotal: number; 
+  commissionTotal: number;
+  gmvReal: number;
+  commissionReal: number;
+}) {
   return (
-    <div className="bg-primary p-6 rounded-[18px] shadow-lg text-white relative overflow-hidden">
+    <div className="bg-primary p-4 rounded-2xl shadow-lg text-white relative overflow-hidden">
       <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
       <div className="absolute -left-8 -bottom-8 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
       
-      <div className="relative z-10 space-y-6">
+      <div className="relative z-10 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold opacity-90">Resumo estimado</h2>
-          <button title="Informação sobre valores estimados">
+          <h2 className="text-sm font-bold opacity-90 uppercase tracking-wider">Resumo</h2>
+          <button title="Informação sobre valores">
             <Info size={16} className="opacity-70" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-1">
-            <p className="text-xs font-medium opacity-80">GMV estimado</p>
-            <p className="text-3xl font-extrabold">{formatCurrency(gmv)}</p>
+        <div className="grid grid-cols-2 gap-2 relative">
+          {/* Separator */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-white/20 -translate-x-1/2"></div>
+          
+          {/* Left Side: Todos Pedidos */}
+          <div className="space-y-4">
+            <p className="text-[10px] font-bold opacity-70 uppercase tracking-widest">Todos pedidos</p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-[10px] font-medium opacity-60 uppercase">GMV Total</p>
+                <p className="text-xl md:text-2xl font-black">{formatCurrency(gmvTotal)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-medium opacity-60 uppercase">Comissão Total</p>
+                <p className="text-lg md:text-xl font-bold opacity-90">{formatCurrency(commissionTotal)}</p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            <p className="text-xs font-medium opacity-80">Comissão estimada</p>
-            <p className="text-3xl font-extrabold">{formatCurrency(commission)}</p>
+
+          {/* Right Side: Pedidos Pagos */}
+          <div className="space-y-4 pl-2">
+            <p className="text-[10px] font-bold opacity-70 uppercase tracking-widest">Pedidos Pagos</p>
+            <div className="space-y-3">
+              <div>
+                <p className="text-[10px] font-medium opacity-60 uppercase">GMV Real</p>
+                <p className="text-xl md:text-2xl font-black">{formatCurrency(gmvReal)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-medium opacity-60 uppercase">Comissão Real</p>
+                <p className="text-lg md:text-xl font-bold opacity-90">{formatCurrency(commissionReal)}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
