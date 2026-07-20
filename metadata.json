@@ -1,0 +1,8 @@
+{
+  "name": "TikDash",
+  "description": "Dashboard premium para análise de vendas de afiliados do TikTok Shop. Transforme suas planilhas em decisões inteligentes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

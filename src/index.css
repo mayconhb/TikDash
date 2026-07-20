@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #6D5DFB;
+  --color-primary-dark: #5546E8;
+  --color-primary-light: #EEECFF;
+  --color-background-main: #F7F8FA;
+  --color-background-secondary: #F1F3F6;
+  --color-card: #FFFFFF;
+  --color-text-main: #18181B;
+  --color-text-secondary: #71717A;
+  --color-text-tertiary: #A1A1AA;
+  --color-border-main: #E4E4E7;
+
+  /* Semantic Colors */
+  --color-status-settled: #16A34A;
+  --color-status-settled-light: #ECFDF3;
+  --color-status-pending: #F59E0B;
+  --color-status-pending-light: #FFF8E6;
+  --color-status-awaiting: #3B82F6;
+  --color-status-awaiting-light: #EFF6FF;
+  --color-status-ineligible: #EF4444;
+  --color-status-ineligible-light: #FEF2F2;
+  --color-status-gmv: #6D5DFB;
+  --color-status-commission: #14B8A6;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 18px;
+  --radius-button: 12px;
+  --radius-input: 12px;
+}
+
+@layer base {
+  body {
+    @apply bg-background-main text-text-main font-sans;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02), 0 8px 24px rgba(15,23,42,0.04);
+}
