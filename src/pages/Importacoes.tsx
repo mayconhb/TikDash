@@ -115,7 +115,7 @@ export default function Importacoes() {
       <div className="flex justify-between items-end">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-text-main tracking-tight">Importações</h1>
-          <p className="text-text-secondary text-sm">Gerencie suas planilhas do TikTok Shop.</p>
+          <p className="text-text-secondary text-base">Gerencie suas planilhas do TikTok Shop.</p>
         </div>
         <label className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl font-bold shadow-md cursor-pointer transition-all active:scale-[0.98] flex items-center space-x-2">
           <FileUp size={20} />
@@ -133,7 +133,7 @@ export default function Importacoes() {
               </div>
               <div className="space-y-1">
                 <p className="font-bold text-text-main">{uploadProgress.message}</p>
-                <p className="text-xs text-text-secondary">Processando planilha... Não feche esta página.</p>
+                <p className="text-sm text-text-secondary">Processando planilha... Não feche esta página.</p>
               </div>
             </div>
             <span className="text-xl font-black text-primary">{uploadProgress.progress}%</span>
@@ -148,7 +148,7 @@ export default function Importacoes() {
       )}
 
       <div className="space-y-4">
-        <h3 className="font-bold text-text-secondary text-xs uppercase tracking-widest ml-1">Histórico de importações</h3>
+        <h3 className="font-bold text-text-secondary text-sm uppercase tracking-widest ml-1">Histórico de importações</h3>
         
         {imports.length === 0 ? (
           <div className="bg-card p-12 rounded-[18px] border border-dashed border-border-main flex flex-col items-center justify-center text-center space-y-4">
@@ -157,7 +157,7 @@ export default function Importacoes() {
             </div>
             <div className="space-y-1">
               <p className="font-bold text-text-main">Nenhuma planilha importada</p>
-              <p className="text-sm text-text-secondary max-w-xs">Seus dados aparecerão aqui assim que você realizar sua primeira importação.</p>
+              <p className="text-base text-text-secondary max-w-xs">Seus dados aparecerão aqui assim que você realizar sua primeira importação.</p>
             </div>
           </div>
         ) : (
@@ -174,8 +174,8 @@ export default function Importacoes() {
                   </div>
                   <div className="space-y-0.5 min-w-0">
                     <p className="font-bold text-text-main truncate pr-2">{item.original_filename}</p>
-                    <div className="flex items-center space-x-2 text-[10px] text-text-tertiary font-bold uppercase tracking-wider">
-                      <span className="flex items-center"><Clock size={12} className="mr-1" /> {formatDateTime(item.created_at)}</span>
+                    <div className="flex items-center space-x-2 text-[12px] text-text-tertiary font-bold uppercase tracking-wider">
+                      <span className="flex items-center"><Clock size={14} className="mr-1" /> {formatDateTime(item.created_at)}</span>
                       <span>•</span>
                       <span>{item.inserted_rows} linhas</span>
                     </div>
@@ -184,12 +184,12 @@ export default function Importacoes() {
 
                 <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-8">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">GMV Total</p>
-                    <p className="text-sm font-bold text-text-main">{formatCurrency(item.gmv_total)}</p>
+                    <p className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">GMV Total</p>
+                    <p className="text-base font-bold text-text-main">{formatCurrency(item.gmv_total)}</p>
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</p>
-                    <p className="text-sm font-bold text-text-main">{formatCurrency(item.estimated_commission_total)}</p>
+                    <p className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</p>
+                    <p className="text-base font-bold text-text-main">{formatCurrency(item.estimated_commission_total)}</p>
                   </div>
                   <ChevronRight size={20} className="hidden md:block text-text-tertiary group-hover:text-primary transition-colors" />
                 </div>

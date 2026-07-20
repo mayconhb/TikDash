@@ -36,7 +36,7 @@ export default function Analises() {
       )}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold text-text-main tracking-tight">Análises</h1>
-        <p className="text-text-secondary text-sm">Mergulhe nos detalhes do seu desempenho.</p>
+        <p className="text-text-secondary text-base">Mergulhe nos detalhes do seu desempenho.</p>
       </div>
 
       {/* Period Filter */}
@@ -46,15 +46,15 @@ export default function Analises() {
       <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-text-main">Vídeo vs Live</h3>
-          <span className="text-[10px] bg-background-secondary px-2 py-1 rounded-full font-bold text-text-tertiary uppercase">Comparativo</span>
+          <span className="text-[12px] bg-background-secondary px-2 py-1 rounded-full font-bold text-text-tertiary uppercase">Comparativo</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {Object.entries(contentComparison || {}).map(([type, stats]: [string, any]) => (
             <div key={type} className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold capitalize text-text-secondary">{type}</span>
-                <span className="text-xs font-medium text-text-tertiary">{stats.orders} pedidos</span>
+                <span className="text-base font-bold capitalize text-text-secondary">{type}</span>
+                <span className="text-sm font-medium text-text-tertiary">{stats.orders} pedidos</span>
               </div>
               <div className="w-full h-2 bg-background-secondary rounded-full overflow-hidden">
                 <div 
@@ -62,7 +62,7 @@ export default function Analises() {
                   style={{ width: `${summary.gmvTotal > 0 ? (stats.gmv / summary.gmvTotal) * 100 : 0}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-sm">
                 <span className="font-bold text-text-main">{formatCurrency(stats.gmv)} GMV</span>
                 <span className="font-bold text-status-commission">{formatCurrency(stats.commission)} Comissão</span>
               </div>
@@ -77,7 +77,7 @@ export default function Analises() {
         <div className="space-y-6">
           {Object.entries(trafficComparison || {}).map(([source, stats]: [string, any]) => (
             <div key={source} className="flex items-center space-x-4">
-              <div className="w-24 text-xs font-bold text-text-secondary capitalize">
+              <div className="w-24 text-sm font-bold text-text-secondary capitalize">
                 {source === 'shop_ads' ? 'Anúncios' : source === 'organic' ? 'Orgânico' : 'Outros'}
               </div>
               <div className="flex-1 h-3 bg-background-secondary rounded-full overflow-hidden">
@@ -86,7 +86,7 @@ export default function Analises() {
                   style={{ width: `${summary.gmvTotal > 0 ? (stats.gmv / summary.gmvTotal) * 100 : 0}%` }}
                 ></div>
               </div>
-              <div className="w-24 text-right text-xs font-bold text-text-main">
+              <div className="w-24 text-right text-sm font-bold text-text-main">
                 {summary.gmvTotal > 0 ? ((stats.gmv / summary.gmvTotal) * 100).toFixed(1) : 0}%
               </div>
             </div>
@@ -116,16 +116,16 @@ export default function Analises() {
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-bold text-text-main line-clamp-2 leading-tight h-10">{product.name}</p>
-                <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">{product.sold} unidades vendidas</p>
+                <p className="text-base font-bold text-text-main line-clamp-2 leading-tight h-10">{product.name}</p>
+                <p className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">{product.sold} unidades vendidas</p>
               </div>
               <div className="pt-3 border-t border-border-main flex justify-between">
                 <div>
-                  <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-wider">GMV</p>
+                  <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">GMV</p>
                   <p className="text-sm font-bold text-text-main">{formatCurrency(product.gmv)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</p>
+                  <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</p>
                   <p className="text-sm font-bold text-status-commission">{formatCurrency(product.commission)}</p>
                 </div>
               </div>

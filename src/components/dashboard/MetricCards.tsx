@@ -30,14 +30,14 @@ export function StatusMetricCard({ title, count, color, icon }: MetricCardProps)
         <div className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center ${bgMap[color]} ${colorMap[color]} transition-transform group-hover:scale-105`}>
           {icon}
         </div>
-        <p className="text-[11px] sm:text-[12px] uppercase font-bold text-text-tertiary tracking-wider leading-tight whitespace-pre-line">
+        <p className="text-[13px] sm:text-[14px] uppercase font-bold text-text-tertiary tracking-wider leading-tight whitespace-pre-line">
           {title}
         </p>
       </div>
       
       <div className="flex items-baseline gap-1 mt-auto">
         <p className="text-2xl font-black text-text-main leading-none">{formatNumber(count)}</p>
-        <span className="text-[12px] font-medium text-text-tertiary truncate">pedidos</span>
+        <span className="text-[14px] font-medium text-text-tertiary truncate">pedidos</span>
       </div>
     </div>
   );
@@ -61,9 +61,9 @@ export function SummaryCard({
       
       <div className="relative z-10 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold opacity-90 uppercase tracking-wider">Resumo</h2>
+          <h2 className="text-base font-bold opacity-90 uppercase tracking-wider">Resumo</h2>
           <button title="Informação sobre valores">
-            <Info size={16} className="opacity-70" />
+            <Info size={18} className="opacity-70" />
           </button>
         </div>
 
@@ -73,14 +73,14 @@ export function SummaryCard({
           
           {/* Left Side: Todos Pedidos */}
           <div className="space-y-4">
-            <p className="text-[10px] font-bold opacity-70 uppercase tracking-widest">Todos pedidos</p>
+            <p className="text-[12px] font-bold opacity-70 uppercase tracking-widest">Todos pedidos</p>
             <div className="space-y-3">
               <div>
-                <p className="text-[10px] font-medium opacity-60 uppercase">GMV Total</p>
+                <p className="text-[11px] font-medium opacity-60 uppercase">GMV Total</p>
                 <p className="text-xl md:text-2xl font-black">{formatCurrency(gmvTotal)}</p>
               </div>
               <div>
-                <p className="text-[10px] font-medium opacity-60 uppercase">Comissão Total</p>
+                <p className="text-[11px] font-medium opacity-60 uppercase">Comissão Total</p>
                 <p className="text-lg md:text-xl font-bold opacity-90">{formatCurrency(commissionTotal)}</p>
               </div>
             </div>
@@ -88,14 +88,14 @@ export function SummaryCard({
 
           {/* Right Side: Pedidos Pagos */}
           <div className="space-y-4 pl-2">
-            <p className="text-[10px] font-bold opacity-70 uppercase tracking-widest">Pedidos Pagos</p>
+            <p className="text-[12px] font-bold opacity-70 uppercase tracking-widest">Pedidos Pagos</p>
             <div className="space-y-3">
               <div>
-                <p className="text-[10px] font-medium opacity-60 uppercase">GMV Real</p>
+                <p className="text-[11px] font-medium opacity-60 uppercase">GMV Real</p>
                 <p className="text-xl md:text-2xl font-black">{formatCurrency(gmvReal)}</p>
               </div>
               <div>
-                <p className="text-[10px] font-medium opacity-60 uppercase">Comissão Real</p>
+                <p className="text-[11px] font-medium opacity-60 uppercase">Comissão Real</p>
                 <p className="text-lg md:text-xl font-bold opacity-90">{formatCurrency(commissionReal)}</p>
               </div>
             </div>

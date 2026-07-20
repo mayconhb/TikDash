@@ -102,9 +102,9 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-text-main tracking-tight">
             {getGreeting()}, {profile?.name?.split(' ')[0]}
           </h1>
-          <p className="text-text-secondary text-sm">{motivationalQuote}</p>
+          <p className="text-text-secondary text-base">{motivationalQuote}</p>
           {summary?.lastUpdate && (
-            <p className="text-[10px] text-text-tertiary font-medium">
+            <p className="text-[12px] text-text-tertiary font-medium">
               Atualizado {formatDateTime(summary.lastUpdate)}
             </p>
           )}
@@ -135,8 +135,8 @@ export default function Dashboard() {
       <div className="bg-card p-5 rounded-2xl border border-border-main shadow-sm transition-all hover:shadow-md">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <h3 className="text-[12px] font-bold text-text-tertiary uppercase tracking-widest leading-none mb-1.5">Taxa de Cancelamento</h3>
-            <p className="text-[13px] text-text-secondary font-medium leading-tight">Pedidos não pagos, cancelados ou reembolsados</p>
+            <h3 className="text-[14px] font-bold text-text-tertiary uppercase tracking-widest leading-none mb-1.5">Taxa de Cancelamento</h3>
+            <p className="text-[14px] text-text-secondary font-medium leading-tight">Pedidos não pagos, cancelados ou reembolsados</p>
           </div>
           <span className="text-2xl font-black text-text-main leading-none">{lostPercentage.toFixed(1)}%</span>
         </div>
@@ -144,7 +144,7 @@ export default function Dashboard() {
 
       {/* Status Metrics Title */}
       <div className="pt-6 pb-0">
-        <h2 className="text-[14px] font-bold text-text-tertiary uppercase tracking-[0.1em] leading-none">Status dos Pedidos</h2>
+        <h2 className="text-[16px] font-bold text-text-tertiary uppercase tracking-[0.1em] leading-none">Status dos Pedidos</h2>
       </div>
 
       {/* Status Metrics */}
@@ -182,8 +182,8 @@ export default function Dashboard() {
       <Link to="/relatorio-diario" className="group block bg-card p-6 rounded-[18px] border border-border-main shadow-soft hover:border-primary/30 transition-all">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h3 className="font-bold text-text-main">Quer analisar dia por dia?</h3>
-            <p className="text-sm text-text-secondary">Veja os resultados diários em uma tabela completa e comparável.</p>
+            <h3 className="text-lg font-bold text-text-main">Quer analisar dia por dia?</h3>
+            <p className="text-base text-text-secondary">Veja os resultados diários em uma tabela completa e comparável.</p>
           </div>
           <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
             <ArrowRight size={20} />

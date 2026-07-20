@@ -49,7 +49,7 @@ export function PeriodFilter() {
             <button
               key={item.id}
               onClick={() => setPreset(item.id)}
-              className={`px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 period.preset === item.id
                   ? 'bg-primary text-white shadow-sm'
                   : 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
@@ -60,20 +60,20 @@ export function PeriodFilter() {
           ))}
           <button
             onClick={() => setShowCustom(true)}
-            className={`px-4 py-2 text-xs font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
               period.preset === 'custom'
                 ? 'bg-primary text-white shadow-sm'
                 : 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
             }`}
           >
-            <Calendar size={14} />
+            <Calendar size={16} />
             Personalizado
           </button>
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 text-xs text-text-secondary animate-in fade-in duration-500">
-        <Calendar size={12} className="text-text-tertiary" />
+      <div className="flex items-center space-x-2 text-sm text-text-secondary animate-in fade-in duration-500">
+        <Calendar size={14} className="text-text-tertiary" />
         <span>Exibindo:</span>
         <span className="font-semibold text-text-primary">
           {period.label}
@@ -110,8 +110,8 @@ export function PeriodFilter() {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-text-tertiary">Período Selecionado</span>
-                <div className="text-sm font-semibold text-text-main">
+                <span className="text-[12px] uppercase font-bold tracking-wider text-text-tertiary">Período Selecionado</span>
+                <div className="text-base font-semibold text-text-main">
                   {range?.from ? (
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className="text-primary">{format(range.from, 'dd/MM/yyyy')}</span>

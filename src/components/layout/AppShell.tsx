@@ -28,7 +28,7 @@ function MobileNavItem({ to, icon: Icon, label, active }: NavItemProps) {
       }`}
     >
       <Icon size={24} strokeWidth={active ? 2.5 : 2} />
-      <span className="text-[10px] font-medium leading-none">{label}</span>
+      <span className="text-[11px] font-medium leading-none">{label}</span>
     </Link>
   );
 }
@@ -44,7 +44,7 @@ function DesktopNavItem({ to, icon: Icon, label, active }: NavItemProps) {
       }`}
     >
       <Icon size={20} />
-      <span className="text-sm">{label}</span>
+      <span className="text-base">{label}</span>
     </Link>
   );
 }
@@ -84,15 +84,15 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="pt-6 border-t border-border-main space-y-4">
           <div className="px-2">
-            <p className="text-sm font-semibold text-text-main truncate">{profile?.name || 'Usuário'}</p>
-            <p className="text-xs text-text-tertiary truncate">{profile?.id.substring(0, 8)}...</p>
+            <p className="text-base font-semibold text-text-main truncate">{profile?.name || 'Usuário'}</p>
+            <p className="text-sm text-text-tertiary truncate">{profile?.id.substring(0, 8)}...</p>
           </div>
           <button 
             onClick={() => signOut()}
             className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-xl text-red-500 hover:bg-red-50 transition-colors"
           >
             <LogOut size={20} />
-            <span className="text-sm font-medium">Sair</span>
+            <span className="text-base font-medium">Sair</span>
           </button>
         </div>
       </aside>
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="md:hidden flex items-center justify-between px-4 h-16 bg-card border-b border-border-main sticky top-0 z-10">
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xs italic">T</div>
-            <span className="text-lg font-bold tracking-tight">{APP_CONFIG.name}</span>
+            <span className="text-xl font-bold tracking-tight">{APP_CONFIG.name}</span>
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary-light rounded-full flex items-center justify-center text-primary font-bold text-xs">
@@ -116,7 +116,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {children}
         </div>
 
-        <footer className="mt-auto p-4 text-center text-[10px] text-text-tertiary md:px-8 max-w-7xl mx-auto w-full">
+        <footer className="mt-auto p-4 text-center text-[12px] text-text-tertiary md:px-8 max-w-7xl mx-auto w-full">
           {APP_CONFIG.footer}
         </footer>
       </main>

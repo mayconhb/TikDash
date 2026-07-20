@@ -28,7 +28,7 @@ export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
     <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
       <div className="flex flex-col space-y-1">
         <h3 className="text-lg font-bold text-text-main tracking-tight">GMV e comissão ao longo do tempo</h3>
-        <p className="text-xs text-text-tertiary">Evolução diária dos resultados</p>
+        <p className="text-sm text-text-tertiary">Evolução diária dos resultados</p>
       </div>
 
       <div className="h-[280px] w-full">
@@ -39,13 +39,13 @@ export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
               dataKey="dateFormatted" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A1A1AA' }}
+              tick={{ fontSize: 12, fill: '#A1A1AA' }}
               minTickGap={20}
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A1A1AA' }}
+              tick={{ fontSize: 12, fill: '#A1A1AA' }}
               tickFormatter={(val) => `R$ ${val >= 1000 ? (val / 1000).toFixed(0) + 'k' : val}`}
             />
             <Tooltip 
