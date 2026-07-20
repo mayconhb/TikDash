@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         if (error.code === 'PGRST116') { // Not found
+          console.log('Profile not found, creating new profile for UID:', uid);
           // Create profile if it doesn't exist
           const newProfile = {
             id: uid,
@@ -56,12 +57,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single();
 
           if (insertError) {
-            console.error('Error creating profile:', insertError);
+            console.error('Error creating profile (likely table "profiles" missing or RLS issue):', insertError);
+            // Fallback to minimal profile in memory if table is missing so app doesn't break
+            setProfile(newProfile as unknown as Profile);
           } else {
+            console.log('Profile created successfully');
             setProfile(createdProfile as unknown as Profile);
           }
         } else {
           console.error('Error fetching profile:', error);
+          // Fallback for demo/missing table
+          setProfile({
+            id: uid,
+            name: 'Usuário',
+            onboarding_completed: false,
+            created_at: new Date(),
+            updated_at: new Date()
+          } as unknown as Profile);
         }
       } else {
         setProfile(data as unknown as Profile);

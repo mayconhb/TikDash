@@ -23,13 +23,40 @@ export const supabase = isValidUrl(supabaseUrl)
       auth: {
         getSession: async () => ({ data: { session: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-        signInWithPassword: async () => ({ data: { user: null, session: null }, error: new Error('Supabase not configured') }),
+        signInWithPassword: async ({ email }: any) => {
+          // Simulate success for any login in demo mode
+          return { 
+            data: { 
+              user: { 
+                id: 'demo-user-id', 
+                email, 
+                user_metadata: { full_name: 'Usuário Demo' } 
+              }, 
+              session: { access_token: 'demo-token' } 
+            }, 
+            error: null 
+          };
+        },
+        signUp: async ({ email, options }: any) => {
+          // Simulate success for signup
+          return { 
+            data: { 
+              user: { 
+                id: 'demo-user-id', 
+                email, 
+                user_metadata: options?.data || {} 
+              }, 
+              session: { access_token: 'demo-token' } 
+            }, 
+            error: null 
+          };
+        },
         signOut: async () => ({ error: null }),
       },
       from: () => ({
         select: () => ({
           eq: () => ({
-            single: async () => ({ data: null, error: { code: 'PGRST116', message: 'Supabase not configured' } }),
+            single: async () => ({ data: null, error: { code: 'PGRST116', message: 'Demo mode' } }),
             order: () => ({
               gte: () => ({
                 lte: () => ({
@@ -37,11 +64,19 @@ export const supabase = isValidUrl(supabaseUrl)
                 })
               })
             })
+          }),
+          order: () => ({
+            limit: async () => ({ data: [], error: null })
           })
         }),
-        insert: () => ({
+        insert: (data: any) => ({
           select: () => ({
-            single: async () => ({ data: null, error: new Error('Supabase not configured') })
+            single: async () => ({ data: Array.isArray(data) ? data[0] : data, error: null })
+          })
+        }),
+        upsert: (data: any) => ({
+          select: () => ({
+            single: async () => ({ data: Array.isArray(data) ? data[0] : data, error: null })
           })
         })
       })
