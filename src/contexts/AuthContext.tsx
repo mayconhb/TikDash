@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
 
-  const fetchProfile = async (uid: string) => {
+  const fetchProfile = async (uid: string, metadata?: any) => {
     if (uid === '00000000-0000-0000-0000-000000000000') {
       setProfile({
         id: '00000000-0000-0000-0000-000000000000',
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Create profile if it doesn't exist
           const newProfile = {
             id: uid,
-            name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário',
+            name: metadata?.full_name || 'Usuário',
             onboarding_completed: false,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -86,20 +86,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchProfile(currentUser.id, currentUser.user_metadata);
       }
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       
       if (currentUser) {
-        await fetchProfile(currentUser.id);
+        await fetchProfile(currentUser.id, currentUser.user_metadata);
       } else {
         setProfile(null);
       }

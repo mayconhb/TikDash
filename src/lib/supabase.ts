@@ -23,8 +23,25 @@ export const supabase = isValidUrl(supabaseUrl)
       auth: {
         getSession: async () => ({ data: { session: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signUp: async ({ email, password, options }: any) => {
+          console.log('Demo Mode: Simulating SignUp for', email);
+          return { 
+            data: { 
+              user: { 
+                id: 'demo-user-id-' + Math.random().toString(36).substring(7), 
+                email, 
+                user_metadata: options?.data || {} 
+              }, 
+              session: { 
+                access_token: 'demo-token',
+                user: { id: 'demo-user-id', email }
+              } 
+            }, 
+            error: null 
+          };
+        },
         signInWithPassword: async ({ email }: any) => {
-          // Simulate success for any login in demo mode
+          console.log('Demo Mode: Simulating Login for', email);
           return { 
             data: { 
               user: { 
@@ -32,21 +49,10 @@ export const supabase = isValidUrl(supabaseUrl)
                 email, 
                 user_metadata: { full_name: 'Usuário Demo' } 
               }, 
-              session: { access_token: 'demo-token' } 
-            }, 
-            error: null 
-          };
-        },
-        signUp: async ({ email, options }: any) => {
-          // Simulate success for signup
-          return { 
-            data: { 
-              user: { 
-                id: 'demo-user-id', 
-                email, 
-                user_metadata: options?.data || {} 
-              }, 
-              session: { access_token: 'demo-token' } 
+              session: { 
+                access_token: 'demo-token',
+                user: { id: 'demo-user-id', email }
+              } 
             }, 
             error: null 
           };
