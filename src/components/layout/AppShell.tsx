@@ -55,7 +55,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Início' },
-    { to: '/analises', icon: ChartNoAxesCombined, label: 'Análises' },
     { to: '/relatorio-diario', icon: CalendarDays, label: 'Diário' },
     { to: '/importacoes', icon: FileUp, label: 'Importações' },
     { to: '/configuracoes', icon: Settings, label: 'Conta' },
@@ -123,7 +122,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[68px] bg-card border-t border-border-main flex items-center justify-around z-20 pb-safe shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
-        {navItems.slice(0, 4).concat([{ to: '/configuracoes', icon: UserRound, label: 'Conta' }]).map((item) => (
+        {navItems.map((item) => (
           <MobileNavItem 
             key={item.to} 
             {...item} 

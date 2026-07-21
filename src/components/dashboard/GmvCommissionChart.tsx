@@ -25,15 +25,14 @@ export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
   }));
 
   return (
-    <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
-      <div className="flex flex-col space-y-1">
-        <h3 className="text-lg font-bold text-text-main tracking-tight">GMV e comissão ao longo do tempo</h3>
-        <p className="text-sm text-text-tertiary">Evolução diária dos resultados</p>
+    <div className="bg-card px-3 py-5 rounded-[18px] border border-border-main shadow-soft space-y-6">
+      <div className="flex flex-col space-y-1 px-3">
+        <h3 className="text-lg font-bold text-text-main tracking-tight">Evolução diária da Comissão</h3>
       </div>
 
       <div className="h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={formattedData}>
+          <BarChart data={formattedData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E4E4E7" />
             <XAxis 
               dataKey="dateFormatted" 
@@ -50,13 +49,12 @@ export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
             />
             <Tooltip 
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-              formatter={(value: number, name: string) => [formatCurrency(value), name === 'gmv' ? 'GMV' : 'Comissão']}
+              formatter={(value: number) => [formatCurrency(value), 'Comissão']}
               labelFormatter={(label) => `Data: ${label}`}
             />
             <Legend verticalAlign="top" height={36} iconType="circle" />
-            <Bar dataKey="gmv" fill="#6D5DFB" name="gmv" radius={[4, 4, 0, 0]} barSize={20} />
-            <Line type="monotone" dataKey="commission" stroke="#14B8A6" name="commission" strokeWidth={3} dot={false} />
-          </ComposedChart>
+            <Bar dataKey="commission" fill="#14B8A6" name="Comissão" radius={[4, 4, 0, 0]} barSize={25} />
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>

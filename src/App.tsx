@@ -13,7 +13,6 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import Dashboard from './pages/Dashboard';
 import Importacoes from './pages/Importacoes';
-import Analises from './pages/Analises';
 import RelatorioDiario from './pages/RelatorioDiario';
 import Configuracoes from './pages/Configuracoes';
 import Onboarding from './pages/Onboarding';
@@ -63,16 +62,6 @@ export default function App() {
               <PeriodFilterProvider>
                 <AppShell>
                   <Dashboard />
-                </AppShell>
-              </PeriodFilterProvider>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/analises" element={
-            <ProtectedRoute>
-              <PeriodFilterProvider>
-                <AppShell>
-                  <Analises />
                 </AppShell>
               </PeriodFilterProvider>
             </ProtectedRoute>
