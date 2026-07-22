@@ -191,13 +191,35 @@
 }
 
 @layer base {
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-background-main);
+  }
+
   body {
-    @apply bg-background-main text-text-main font-sans;
+    @apply text-text-main font-sans;
     font-variant-numeric: tabular-nums;
     /* Prevent pull-to-refresh on mobile for a more native feel */
     overscroll-behavior-y: none;
     /* Remove tap highlight color on mobile */
     -webkit-tap-highlight-color: transparent;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  /* Safe Area Padding Utility */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   /* Prevent text selection on UI elements for a native feel */
@@ -208,8 +230,7 @@
   /* Optimize for standalone mode (PWA) */
   @media (display-mode: standalone) {
     body {
-      /* Padding for iOS home indicator if needed, though safe-areas usually handle it */
-      padding-bottom: env(safe-area-inset-bottom);
+      background-color: var(--color-background-main);
     }
   }
 }

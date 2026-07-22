@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const currentPath = location.pathname;
 
   return (
-    <div className="min-h-screen bg-background-main flex flex-col md:flex-row">
+    <div className="min-h-[100dvh] bg-background-main flex flex-col md:flex-row">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-[248px] bg-card border-r border-border-main sticky top-0 h-screen p-6 shadow-sm">
         <div className="flex items-center justify-between mb-10 px-2">
@@ -143,7 +143,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[68px] bg-card border-t border-border-main flex items-center justify-around z-20 pb-safe shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 min-h-[68px] bg-card border-t border-border-main flex items-center justify-around z-20 pb-safe shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         {navItems.map((item) => (
           <MobileNavItem 
             key={item.to} 
