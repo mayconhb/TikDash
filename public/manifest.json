@@ -4,7 +4,7 @@
   "description": "Gerenciador de comissões e pedidos para TikTok Shop",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F7F8FA",
+  "background_color": "#ffffff",
   "theme_color": "#6D5DFB",
   "orientation": "portrait",
   "icons": [
