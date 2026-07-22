@@ -1,8 +1,8 @@
 import { 
   usePeriodFilter 
 } from '../../contexts/PeriodFilterContext';
-import { Calendar, X } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
 import { ptBR } from 'date-fns/locale';
 import { format, parseISO } from 'date-fns';
@@ -40,6 +40,19 @@ export function PeriodFilter({
   }, [period]);
 
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
+  const [month, setMonth] = useState<Date>(initialRange?.from || new Date());
+
+  // Update range and month when period changes externally (e.g. presets)
+  useEffect(() => {
+    if (period.preset === 'custom' && period.startDateKey && period.endDateKey) {
+      const from = parseISO(period.startDateKey);
+      const to = parseISO(period.endDateKey);
+      setRange({ from, to });
+      setMonth(from);
+    } else {
+      setRange(undefined);
+    }
+  }, [period]);
 
   const handleApplyCustom = () => {
     if (range?.from && range?.to) {
@@ -118,10 +131,18 @@ export function PeriodFilter({
                 mode="range"
                 selected={range}
                 onSelect={setRange}
+                month={month}
+                onMonthChange={setMonth}
                 locale={ptBR}
                 numberOfMonths={1}
                 className="!m-0 rdp-custom"
                 showOutsideDays
+                components={{
+                  Chevron: (props) => {
+                    if (props.orientation === 'left') return <ChevronLeft className="h-4 w-4" />;
+                    return <ChevronRight className="h-4 w-4" />;
+                  }
+                }}
               />
             </div>
 

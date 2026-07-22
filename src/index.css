@@ -130,9 +130,11 @@
 .rdp-nav {
   position: absolute;
   top: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-between;
+  padding: 0 0.5rem;
   pointer-events: none;
 }
 
@@ -141,9 +143,16 @@
   border: 1px solid var(--color-border-main) !important;
   border-radius: 8px !important;
   color: var(--color-text-secondary) !important;
-  padding: 4px !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
   transition: all 0.2s ease !important;
   pointer-events: auto;
+  cursor: pointer;
+  z-index: 20;
 }
 
 .rdp-nav_button:hover {
