@@ -88,6 +88,7 @@ export const supabase = isValidUrl(supabaseUrl)
       }),
       rpc: async (fn: string) => {
         console.warn(`RPC call to '${fn}' is not implemented in Demo Mode.`);
-        return { data: null, error: { code: 'PGRST202', message: `RPC '${fn}' not implemented in demo mode` } };
+        // Return empty data instead of error to avoid console noise in demo mode
+        return { data: [], error: null };
       }
     } as any);
