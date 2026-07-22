@@ -582,8 +582,8 @@ export const dashboardService = {
         }
         const d = dailyMap.get(dateKey)!;
         d.orders.add(row.order_id);
-        const gmvValue = Number(row.gmv || 0);
-        const commValue = Number(row.estimated_commission || 0);
+        const gmvValue = Number(row.gmv || 0) || 0;
+        const commValue = Number(row.estimated_commission || 0) || 0;
         
         d.gmv += gmvValue;
         d.commission += commValue;
@@ -647,8 +647,8 @@ export const dashboardService = {
         }
         const d = dailyMap.get(dateKey)!;
         d.orders.add(row.order_id);
-        const gmvValue = Number(row.gmv || 0);
-        const commValue = Number(row.estimated_commission || 0);
+        const gmvValue = Number(row.gmv || 0) || 0;
+        const commValue = Number(row.estimated_commission || 0) || 0;
         
         d.gmv += gmvValue;
         d.commission += commValue;
