@@ -585,10 +585,12 @@ export const dashboardService = {
         const gmvValue = Number(row.gmv || 0) || 0;
         const commValue = Number(row.estimated_commission || 0) || 0;
         
-        d.gmv += gmvValue;
-        d.commission += commValue;
-        
         const s = row.normalized_settlement_status;
+        if (s === 'settled' || s === 'pending') {
+          d.gmv += gmvValue;
+          d.commission += commValue;
+        }
+        
         if (s === 'settled') d.settled.add(row.order_id);
         else if (s === 'pending') d.pending.add(row.order_id);
         else if (s === 'awaiting_payment') {
@@ -650,10 +652,12 @@ export const dashboardService = {
         const gmvValue = Number(row.gmv || 0) || 0;
         const commValue = Number(row.estimated_commission || 0) || 0;
         
-        d.gmv += gmvValue;
-        d.commission += commValue;
-        
         const s = row.normalized_settlement_status;
+        if (s === 'settled' || s === 'pending') {
+          d.gmv += gmvValue;
+          d.commission += commValue;
+        }
+        
         if (s === 'settled') d.settled.add(row.order_id);
         else if (s === 'pending') d.pending.add(row.order_id);
         else if (s === 'awaiting_payment') {

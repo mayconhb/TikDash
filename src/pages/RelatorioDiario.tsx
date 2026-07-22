@@ -50,10 +50,9 @@ export default function RelatorioDiario() {
       {/* Cards View (Main View) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedData.map((day) => {
-          const awaitingComm = Number(day.awaiting_commission || 0);
-          const ineligibleComm = Number(day.ineligible_commission || 0);
-          const totalComm = Number(day.commission || 0);
-          const lostPercentage = totalComm > 0 ? ((awaitingComm + ineligibleComm) / totalComm) * 100 : 0;
+          const totalOrders = day.orders;
+          const lostOrders = day.awaiting + day.ineligible;
+          const lostPercentage = totalOrders > 0 ? (lostOrders / totalOrders) * 100 : 0;
           
           return (
             <div key={day.date} className="bg-card rounded-[24px] border border-border-main shadow-soft p-6 space-y-5 flex flex-col transition-all hover:shadow-md">
@@ -97,11 +96,11 @@ export default function RelatorioDiario() {
 
                 <div className="pt-4 border-t border-border-main grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <span className="text-[13px] text-text-tertiary font-bold uppercase tracking-wider">GMV Total</span>
+                    <span className="text-[13px] text-text-tertiary font-bold uppercase tracking-wider">GMV Real</span>
                     <p className="text-xl font-bold text-text-main">{formatCurrency(day.gmv)}</p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[13px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</span>
+                    <span className="text-[13px] text-text-tertiary font-bold uppercase tracking-wider">Comissão Real</span>
                     <p className="text-2xl font-black text-status-commission">{formatCurrency(day.commission)}</p>
                   </div>
                 </div>

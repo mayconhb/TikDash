@@ -59,10 +59,10 @@ export default function Dashboard() {
   }, [statusMetrics]);
 
   const lostPercentage = useMemo(() => {
-    const commissionTotal = metrics.pending.commission + metrics.awaiting_payment.commission + metrics.ineligible.commission + metrics.settled.commission;
-    const lostCommissionIneligible = metrics.ineligible.commission;
-    const lostCommissionAwaiting = metrics.awaiting_payment.commission;
-    return commissionTotal > 0 ? ((lostCommissionIneligible + lostCommissionAwaiting) / commissionTotal) * 100 : 0;
+    const totalOrders = metrics.pending.count + metrics.awaiting_payment.count + metrics.ineligible.count + metrics.settled.count;
+    const lostOrdersIneligible = metrics.ineligible.count;
+    const lostOrdersAwaiting = metrics.awaiting_payment.count;
+    return totalOrders > 0 ? ((lostOrdersIneligible + lostOrdersAwaiting) / totalOrders) * 100 : 0;
   }, [metrics]);
 
   if (loading && !summary) {
