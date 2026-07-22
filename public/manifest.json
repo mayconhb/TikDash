@@ -1,6 +1,6 @@
 {
-  "name": "TikTok Shop Manager",
-  "short_name": "ShopManager",
+  "name": "TikDash TikTok Shop Manager",
+  "short_name": "TikDash",
   "description": "Gerenciador de comissões e pedidos para TikTok Shop",
   "start_url": "/",
   "display": "standalone",
@@ -9,16 +9,18 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon.svg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": ["business", "finance"],
+  "screenshots": []
 }
