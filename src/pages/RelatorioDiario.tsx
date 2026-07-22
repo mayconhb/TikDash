@@ -56,12 +56,12 @@ export default function RelatorioDiario() {
           const lostPercentage = totalComm > 0 ? ((awaitingComm + ineligibleComm) / totalComm) * 100 : 0;
           
           return (
-            <div key={day.date} className="bg-card rounded-[20px] border border-border-main shadow-soft p-4 space-y-3 flex flex-col transition-all hover:shadow-md">
-              <div className="flex justify-between items-start border-b border-border-main pb-2">
-                <span className="text-base font-extrabold text-text-main tracking-tight">{formatDateKeyPtBr(day.date)}</span>
+            <div key={day.date} className="bg-card rounded-[24px] border border-border-main shadow-soft p-6 space-y-5 flex flex-col transition-all hover:shadow-md">
+              <div className="flex justify-between items-start border-b border-border-main pb-4">
+                <span className="text-lg font-extrabold text-text-main tracking-tight">{formatDateKeyPtBr(day.date)}</span>
                 <div className="flex flex-col items-end text-right">
-                  <span className="text-[9px] text-text-tertiary uppercase tracking-wider leading-tight">Taxa de cancelamento</span>
-                  <span className={`text-xs font-medium ${
+                  <span className="text-[10px] text-text-tertiary uppercase tracking-wider leading-tight">Taxa de cancelamento</span>
+                  <span className={`text-sm font-medium ${
                     lostPercentage > 10 ? 'text-red-500' : 
                     lostPercentage > 5 ? 'text-amber-500' : 
                     'text-emerald-500'
@@ -71,38 +71,38 @@ export default function RelatorioDiario() {
                 </div>
               </div>
               
-              <div className="flex-1 space-y-3">
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center bg-background-secondary/30 px-2 py-1.5 rounded-lg">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Total de pedidos</span>
-                    <p className="text-xs font-bold text-text-main">{formatNumber(day.orders)}</p>
+              <div className="flex-1 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center bg-background-secondary/30 p-2 rounded-lg">
+                    <span className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Total de pedidos</span>
+                    <p className="text-sm font-bold text-text-main">{formatNumber(day.orders)}</p>
                   </div>
-                  <div className="flex justify-between items-center px-2 py-0.5">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Pendentes</span>
-                    <p className="text-xs font-bold text-text-main">{formatNumber(day.pending)}</p>
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Pendentes</span>
+                    <p className="text-sm font-bold text-text-main">{formatNumber(day.pending)}</p>
                   </div>
-                  <div className="flex justify-between items-center px-2 py-0.5">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Aguardando pagamento</span>
-                    <p className="text-xs font-bold text-text-main">{formatNumber(day.awaiting)}</p>
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Aguardando pagamento</span>
+                    <p className="text-sm font-bold text-text-main">{formatNumber(day.awaiting)}</p>
                   </div>
-                  <div className="flex justify-between items-center px-2 py-0.5">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Inelegíveis</span>
-                    <p className="text-xs font-bold text-text-main">{formatNumber(day.ineligible)}</p>
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Inelegíveis</span>
+                    <p className="text-sm font-bold text-text-main">{formatNumber(day.ineligible)}</p>
                   </div>
-                  <div className="flex justify-between items-center px-2 py-0.5">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Liquidados</span>
-                    <p className="text-xs font-bold text-text-main">{formatNumber(day.settled)}</p>
+                  <div className="flex justify-between items-center px-2">
+                    <span className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Liquidados</span>
+                    <p className="text-sm font-bold text-text-main">{formatNumber(day.settled)}</p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border-main grid grid-cols-2 gap-4">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">GMV Total</span>
-                    <p className="text-sm font-bold text-text-main">{formatCurrency(day.gmv)}</p>
+                <div className="pt-4 border-t border-border-main grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">GMV Total</span>
+                    <p className="text-lg font-bold text-text-main">{formatCurrency(day.gmv)}</p>
                   </div>
-                  <div className="space-y-0.5 text-right">
-                    <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</span>
-                    <p className="text-base font-black text-status-commission">{formatCurrency(day.commission)}</p>
+                  <div className="space-y-1">
+                    <span className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</span>
+                    <p className="text-xl font-black text-status-commission">{formatCurrency(day.commission)}</p>
                   </div>
                 </div>
               </div>
