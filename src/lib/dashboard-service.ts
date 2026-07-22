@@ -274,9 +274,9 @@ export const dashboardService = {
     if (this.isDemo(params.userId)) {
       const rows = demoStorage.getRows(params.userId!, params.startUtc, params.endUtcExclusive);
       const stats: any = {
-        video: { orders: 0, gmv: 0, commission: 0 },
-        live: { orders: 0, gmv: 0, commission: 0 },
-        other: { orders: 0, gmv: 0, commission: 0 },
+        video: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        live: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        other: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
       };
       const uniqueOrders = new Map<string, Set<string>>();
 
@@ -285,8 +285,16 @@ export const dashboardService = {
         if (stats[content]) {
           if (!uniqueOrders.has(content)) uniqueOrders.set(content, new Set());
           uniqueOrders.get(content)!.add(r.order_id);
-          stats[content].gmv += r.gmv;
-          stats[content].commission += r.estimated_commission;
+          const gmvVal = Number(r.gmv || 0);
+          const commVal = Number(r.estimated_commission || 0);
+          
+          stats[content].gmv += gmvVal;
+          stats[content].commission += commVal;
+
+          if (r.normalized_settlement_status === 'settled' || r.normalized_settlement_status === 'pending') {
+            stats[content].gmvReal += gmvVal;
+            stats[content].commissionReal += commVal;
+          }
         }
       });
       Object.keys(stats).forEach(c => stats[c].orders = uniqueOrders.get(c)?.size || 0);
@@ -298,7 +306,21 @@ export const dashboardService = {
         p_start_at: params.startUtc,
         p_end_at_exclusive: params.endUtcExclusive,
       });
-      if (!error && data) return data;
+      if (!error && data) {
+        // Normalize RPC output to ensure new fields exist
+        const normalized: any = {};
+        ['video', 'live', 'other'].forEach(key => {
+          const stats = data[key] || { orders: 0, gmv: 0, commission: 0 };
+          normalized[key] = {
+            orders: stats.orders || 0,
+            gmv: stats.gmv || 0,
+            commission: stats.commission || 0,
+            gmvReal: stats.gmvReal ?? stats.gmv ?? 0,
+            commissionReal: stats.commissionReal ?? stats.commission ?? 0
+          };
+        });
+        return normalized;
+      }
       if (error && error.code !== 'PGRST202') throw error;
     } catch (e) {
       console.warn('RPC get_content_type_comparison failed, using fallback', e);
@@ -306,11 +328,11 @@ export const dashboardService = {
 
     // Fallback
     try {
-      const rows = await this.getAllRows('gmv, estimated_commission, order_id, content_type_normalized', params);
+      const rows = await this.getAllRows('gmv, estimated_commission, order_id, content_type_normalized, normalized_settlement_status', params);
       const stats: any = {
-        video: { orders: 0, gmv: 0, commission: 0 },
-        live: { orders: 0, gmv: 0, commission: 0 },
-        other: { orders: 0, gmv: 0, commission: 0 },
+        video: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        live: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        other: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
       };
       const uniqueOrders = new Map<string, Set<string>>();
 
@@ -319,17 +341,26 @@ export const dashboardService = {
         const key = stats[content] ? content : 'other';
         if (!uniqueOrders.has(key)) uniqueOrders.set(key, new Set());
         uniqueOrders.get(key)!.add(r.order_id);
-        stats[key].gmv += Number(r.gmv || 0);
-        stats[key].commission += Number(r.estimated_commission || 0);
+        
+        const gmvVal = Number(r.gmv || 0);
+        const commVal = Number(r.estimated_commission || 0);
+
+        stats[key].gmv += gmvVal;
+        stats[key].commission += commVal;
+
+        if (r.normalized_settlement_status === 'settled' || r.normalized_settlement_status === 'pending') {
+          stats[key].gmvReal += gmvVal;
+          stats[key].commissionReal += commVal;
+        }
       });
       Object.keys(stats).forEach(c => stats[c].orders = uniqueOrders.get(c)?.size || 0);
       return stats;
     } catch (e) {
       console.error('Fallback getContentTypeComparison failed:', e);
       return {
-        video: { orders: 0, gmv: 0, commission: 0 },
-        live: { orders: 0, gmv: 0, commission: 0 },
-        other: { orders: 0, gmv: 0, commission: 0 },
+        video: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        live: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
+        other: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
       };
     }
   },

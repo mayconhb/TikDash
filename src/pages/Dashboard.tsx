@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   useDashboardSummary, 
@@ -22,9 +22,9 @@ import {
   Medal
 } from 'lucide-react';
 import { 
-  formatDateTime,
   getNowInAppTimeZone,
-  formatCurrency
+  formatCurrency,
+  formatNumber
 } from '../utils/formatters';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -40,6 +40,7 @@ export default function Dashboard() {
   const { data: chartData, isLoading: chartLoading, isFetching: chartFetching } = useDashboardChart();
   const { data: contentComparison, isLoading: contentLoading, isFetching: contentFetching } = useContentTypeComparison();
   const { data: topProducts, isLoading: topProductsLoading, isFetching: topProductsFetching } = useTopProducts();
+  const [showAllTopProducts, setShowAllTopProducts] = useState(false);
 
   const loading = summaryLoading || statusLoading || chartLoading || contentLoading || topProductsLoading;
   const isFetching = summaryFetching || statusFetching || chartFetching || contentFetching || topProductsFetching;
@@ -116,11 +117,6 @@ export default function Dashboard() {
             {greeting}, {profile?.name?.split(' ')[0]}
           </h1>
           <p className="text-text-secondary text-base">{motivationalQuote}</p>
-          {summary?.lastUpdate && (
-            <p className="text-[12px] text-text-tertiary font-medium">
-              Atualizado {formatDateTime(summary.lastUpdate)}
-            </p>
-          )}
         </div>
         <div className="flex flex-col items-end">
           <Link 
@@ -191,87 +187,266 @@ export default function Dashboard() {
       {/* Main Chart */}
       <GmvCommissionChart data={chartData || []} />
 
-      {/* Top Products */}
-      <div className="space-y-4">
-        <h3 className="font-bold text-text-main text-lg tracking-tight">Produtos mais vendidos</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {(topProducts || []).slice(0, 3).map((product: any, index: number) => (
-            <div key={product.id} className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-4 relative overflow-hidden group">
-              <div className={`absolute -right-2 -top-2 w-16 h-16 opacity-10 flex items-center justify-center rotate-12 transition-transform group-hover:scale-110`}>
-                <Medal size={64} />
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  index === 0 ? 'bg-yellow-400 text-yellow-900' : 
-                  index === 1 ? 'bg-slate-300 text-slate-700' : 
-                  'bg-orange-300 text-orange-800'
-                }`}>
-                  {index + 1}
-                </div>
-                <div className="w-10 h-10 bg-background-secondary rounded-lg flex items-center justify-center text-text-tertiary">
-                  <Package size={20} />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-base font-bold text-text-main line-clamp-2 leading-tight h-10">{product.name}</p>
-                <p className="text-[12px] text-text-tertiary font-bold uppercase tracking-wider">{product.sold} unidades vendidas</p>
-              </div>
-              <div className="pt-3 border-t border-border-main flex justify-between">
-                <div>
-                  <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">GMV</p>
-                  <p className="text-sm font-bold text-text-main">{formatCurrency(product.gmv)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Comissão</p>
-                  <p className="text-sm font-bold text-status-commission">{formatCurrency(product.commission)}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Video vs Live */}
       <div className="bg-card p-6 rounded-[18px] border border-border-main shadow-soft space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-text-main">Vídeo vs Live</h3>
-          <span className="text-[12px] bg-background-secondary px-2 py-1 rounded-full font-bold text-text-tertiary uppercase">Comparativo</span>
+          <div className="space-y-1">
+            <h3 className="font-bold text-text-main text-lg tracking-tight">Vídeo vs Live</h3>
+            <p className="text-sm text-text-tertiary">Comparativo de performance por canal</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {Object.entries(contentComparison || {}).map(([type, stats]: [string, any]) => (
-            <div key={type} className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-base font-bold capitalize text-text-secondary">{type}</span>
-                <span className="text-sm font-medium text-text-tertiary">{stats.orders} pedidos</span>
+        {(() => {
+          const video = contentComparison?.video || { commission: 0, orders: 0, gmv: 0, gmvReal: 0, commissionReal: 0 };
+          const live = contentComparison?.live || { commission: 0, orders: 0, gmv: 0, gmvReal: 0, commissionReal: 0 };
+          
+          const videoCommReal = video.commissionReal || 0;
+          const liveCommReal = live.commissionReal || 0;
+          const videoGmvReal = video.gmvReal || 0;
+          const liveGmvReal = live.gmvReal || 0;
+
+          const totalComm = videoCommReal + liveCommReal;
+          const videoPercent = totalComm > 0 ? (videoCommReal / totalComm) * 100 : 50;
+          const livePercent = 100 - videoPercent;
+
+          return (
+            <div className="space-y-6 pt-2">
+              <div className="flex justify-between items-end mb-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary" />
+                    <span className="text-sm font-bold text-text-main uppercase tracking-tight">Vídeo</span>
+                  </div>
+                  <p className="text-2xl font-black text-text-main leading-none">
+                    {totalComm > 0 ? videoPercent.toFixed(1) : "0"}%
+                  </p>
+                </div>
+                <div className="text-right space-y-1">
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="text-sm font-bold text-text-main uppercase tracking-tight">Live</span>
+                    <div className="w-3 h-3 rounded-full bg-status-commission" />
+                  </div>
+                  <p className="text-2xl font-black text-text-main leading-none">
+                    {totalComm > 0 ? livePercent.toFixed(1) : "0"}%
+                  </p>
+                </div>
               </div>
-              <div className="w-full h-2 bg-background-secondary rounded-full overflow-hidden">
+
+              <div className="relative h-3 w-full bg-background-secondary rounded-full overflow-hidden flex shadow-inner border border-border-main/50">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${videoPercent}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full bg-primary relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                </motion.div>
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${livePercent}%` }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full bg-status-commission relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-l from-white/10 to-transparent" />
+                </motion.div>
+                
+                {/* Center Divider/Indicator */}
                 <div 
-                  className={`h-full ${type === 'video' ? 'bg-primary' : type === 'live' ? 'bg-status-commission' : 'bg-text-tertiary'}`} 
-                  style={{ width: `${summary?.gmvTotal > 0 ? (stats.gmv / summary.gmvTotal) * 100 : 0}%` }}
-                ></div>
+                  className="absolute top-0 bottom-0 w-1 bg-white/30 backdrop-blur-sm z-10 transition-all duration-1000"
+                  style={{ left: `calc(${videoPercent}% - 0.5px)` }}
+                />
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="font-bold text-text-main">{formatCurrency(stats.gmv)} GMV</span>
-                <span className="font-bold text-status-commission">{formatCurrency(stats.commission)} Comissão</span>
+
+              <div className="grid grid-cols-2 gap-8 pt-2 px-1">
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Pedidos</p>
+                    <p className="text-xl font-black text-text-main leading-none">{formatNumber(video.orders || 0)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">GMV Real</p>
+                    <p className="text-base font-bold text-text-secondary leading-none">{formatCurrency(videoGmvReal)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Comissão Real</p>
+                    <p className="text-base font-bold text-status-commission leading-none">{formatCurrency(videoCommReal)}</p>
+                  </div>
+                </div>
+                <div className="space-y-4 text-right">
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Pedidos</p>
+                    <p className="text-xl font-black text-text-main leading-none">{formatNumber(live.orders || 0)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">GMV Real</p>
+                    <p className="text-base font-bold text-text-secondary leading-none">{formatCurrency(liveGmvReal)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-wider">Comissão Real</p>
+                    <p className="text-base font-bold text-status-commission leading-none">{formatCurrency(liveCommReal)}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
+          );
+        })()}
+      </div>
+
+      {/* Top Products - Leaderboard Redesign */}
+      <div className="bg-card p-6 rounded-[24px] border border-border-main shadow-soft space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h3 className="font-bold text-text-main text-lg tracking-tight">Produtos mais vendidos</h3>
+            <p className="text-sm text-text-tertiary">Performance de elite do período</p>
+          </div>
+          <div className="flex -space-x-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={`w-8 h-8 rounded-full border-2 border-card flex items-center justify-center text-[10px] font-black shadow-sm ${
+                i === 1 ? 'bg-amber-400 text-white z-30' : 
+                i === 2 ? 'bg-slate-300 text-white z-20' : 
+                'bg-orange-300 text-white z-10'
+              }`}>
+                {i}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {(() => {
+            const products = (topProducts || []).slice(0, 3);
+            const extendedProducts = (topProducts || []).slice(3, 10);
+            const maxSold = products.length > 0 ? products[0].sold : 1;
+
+            return (
+              <>
+                {/* Top 3 Elite */}
+                {products.map((product: any, index: number) => (
+                  <div key={product.id} className="relative group">
+                    {/* Relative Progress Bar (Background) */}
+                    <div className="absolute inset-0 bg-background-secondary/20 rounded-2xl overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(product.sold / maxSold) * 100}%` }}
+                        transition={{ duration: 1.2, ease: "circOut", delay: index * 0.1 }}
+                        className={`h-full opacity-10 ${
+                          index === 0 ? 'bg-amber-500' : 
+                          index === 1 ? 'bg-slate-400' : 
+                          'bg-orange-500'
+                        }`}
+                      />
+                    </div>
+
+                    <div className="relative flex items-center p-4 rounded-2xl border border-transparent hover:border-border-main/50 hover:bg-white/50 transition-all duration-300">
+                      {/* Rank Avatar */}
+                      <div className="relative flex-shrink-0 mr-4">
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black text-lg shadow-sm transform transition-transform group-hover:scale-105 ${
+                          index === 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 
+                          index === 1 ? 'bg-slate-50 text-slate-500 border border-slate-100' : 
+                          'bg-orange-50 text-orange-600 border border-orange-100'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        {index === 0 && (
+                          <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full border-2 border-white flex items-center justify-center">
+                            <Medal size={10} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content Grid */}
+                      <div className="flex-1 min-w-0 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-center">
+                        {/* Info */}
+                        <div className="min-w-0">
+                          <h4 className="text-sm font-bold text-text-main truncate mb-1 group-hover:text-primary transition-colors">
+                            {product.name}
+                          </h4>
+                          <div className="flex items-center gap-1.5">
+                            <Package size={12} className="text-text-tertiary" />
+                            <span className="text-[11px] font-black text-text-secondary uppercase tracking-tight">
+                              {formatNumber(product.sold)} <span className="text-text-tertiary font-medium lowercase">vendas</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Financials */}
+                        <div className="flex gap-4 sm:gap-6 items-center justify-end">
+                          <div className="text-right">
+                            <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-widest mb-0.5">GMV</p>
+                            <p className="text-sm font-bold text-text-main tabular-nums tracking-tight whitespace-nowrap">
+                              {formatCurrency(product.gmv)}
+                            </p>
+                          </div>
+                          <div className="text-right min-w-[100px] bg-white/60 px-3 py-2 rounded-xl border border-border-main/30">
+                            <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-widest mb-0.5">Comissão</p>
+                            <p className="text-sm font-black text-status-commission tabular-nums tracking-tight whitespace-nowrap">
+                              {formatCurrency(product.commission)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Expanded List (4-10) */}
+                {showAllTopProducts && extendedProducts.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="pt-4 space-y-2"
+                  >
+                    <div className="px-4 py-2 text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] border-b border-border-main/40 mb-2">
+                      Ranking Complementar
+                    </div>
+                    {extendedProducts.map((product: any, idx: number) => {
+                      const rank = idx + 4;
+                      return (
+                        <div key={product.id} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-background-secondary/50 transition-all group border border-transparent hover:border-border-main/30">
+                          <span className="w-6 text-xs font-black text-text-tertiary/60 group-hover:text-primary/70 transition-colors">{rank}</span>
+                          
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-text-main truncate group-hover:text-primary transition-colors mb-0.5">
+                              {product.name}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-black text-text-secondary uppercase tracking-tighter">
+                                {formatNumber(product.sold)} <span className="text-text-tertiary font-medium">vendas</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-6 text-right">
+                            <div className="hidden sm:block">
+                              <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-widest mb-0.5">GMV</p>
+                              <p className="text-xs font-bold text-text-secondary tabular-nums">{formatCurrency(product.gmv)}</p>
+                            </div>
+                            <div className="min-w-[90px]">
+                              <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-widest mb-0.5">Comissão</p>
+                              <p className="text-sm font-black text-status-commission tabular-nums">{formatCurrency(product.commission)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </motion.div>
+                )}
+
+                {/* Toggle Button */}
+                {(topProducts || []).length > 3 && (
+                  <button 
+                    onClick={() => setShowAllTopProducts(!showAllTopProducts)}
+                    className="w-full py-3 mt-2 text-sm font-bold text-text-tertiary hover:text-primary hover:bg-primary/5 rounded-xl transition-all border border-dashed border-border-main hover:border-primary/30 flex items-center justify-center gap-2"
+                  >
+                    {showAllTopProducts ? 'Ver menos' : `Ver mais (${(topProducts || []).length - 3} produtos)`}
+                  </button>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
 
-      {/* CTA Relatorio */}
-      <Link to="/relatorio-diario" className="group block bg-card p-6 rounded-[18px] border border-border-main shadow-soft hover:border-primary/30 transition-all">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h3 className="text-lg font-bold text-text-main">Quer analisar dia por dia?</h3>
-            <p className="text-base text-text-secondary">Veja os resultados diários em uma tabela completa e comparável.</p>
-          </div>
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-            <ArrowRight size={20} />
-          </div>
-        </div>
-      </Link>
     </div>
   );
 }
