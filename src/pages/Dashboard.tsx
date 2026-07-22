@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   useDashboardSummary, 
@@ -32,7 +33,7 @@ import { getDailyQuote } from '../data/motivational-quotes';
 
 export default function Dashboard() {
   const { profile } = useAuth();
-  const motivationalQuote = getDailyQuote();
+  const motivationalQuote = useMemo(() => getDailyQuote(), []);
   
   const { data: summary, isLoading: summaryLoading, isFetching: summaryFetching } = useDashboardSummary();
   const { data: statusMetrics, isLoading: statusLoading, isFetching: statusFetching } = useStatusSummary();
@@ -43,12 +44,26 @@ export default function Dashboard() {
   const loading = summaryLoading || statusLoading || chartLoading || contentLoading || topProductsLoading;
   const isFetching = summaryFetching || statusFetching || chartFetching || contentFetching || topProductsFetching;
 
-  const getGreeting = () => {
+  const greeting = useMemo(() => {
     const hour = getNowInAppTimeZone().getHours();
     if (hour < 12) return 'Bom dia';
     if (hour < 18) return 'Boa tarde';
     return 'Boa noite';
-  };
+  }, []);
+
+  const metrics = useMemo(() => statusMetrics || {
+    settled: { count: 0, gmv: 0, commission: 0 },
+    pending: { count: 0, gmv: 0, commission: 0 },
+    awaiting_payment: { count: 0, gmv: 0, commission: 0 },
+    ineligible: { count: 0, gmv: 0, commission: 0 },
+  }, [statusMetrics]);
+
+  const lostPercentage = useMemo(() => {
+    const commissionTotal = metrics.pending.commission + metrics.awaiting_payment.commission + metrics.ineligible.commission + metrics.settled.commission;
+    const lostCommissionIneligible = metrics.ineligible.commission;
+    const lostCommissionAwaiting = metrics.awaiting_payment.commission;
+    return commissionTotal > 0 ? ((lostCommissionIneligible + lostCommissionAwaiting) / commissionTotal) * 100 : 0;
+  }, [metrics]);
 
   if (loading && !summary) {
     return (
@@ -85,19 +100,6 @@ export default function Dashboard() {
     );
   }
 
-  // Safety values
-  const metrics = statusMetrics || {
-    settled: { count: 0, gmv: 0, commission: 0 },
-    pending: { count: 0, gmv: 0, commission: 0 },
-    awaiting_payment: { count: 0, gmv: 0, commission: 0 },
-    ineligible: { count: 0, gmv: 0, commission: 0 },
-  };
-
-  const commissionTotal = metrics.pending.commission + metrics.awaiting_payment.commission + metrics.ineligible.commission + metrics.settled.commission;
-  const lostCommissionIneligible = metrics.ineligible.commission;
-  const lostCommissionAwaiting = metrics.awaiting_payment.commission;
-  const lostPercentage = commissionTotal > 0 ? ((lostCommissionIneligible + lostCommissionAwaiting) / commissionTotal) * 100 : 0;
-
   return (
     <div className="space-y-8 relative">
       {/* Background Fetching Indicator */}
@@ -111,7 +113,7 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-text-main tracking-tight">
-            {getGreeting()}, {profile?.name?.split(' ')[0]}
+            {greeting}, {profile?.name?.split(' ')[0]}
           </h1>
           <p className="text-text-secondary text-base">{motivationalQuote}</p>
           {summary?.lastUpdate && (
@@ -187,7 +189,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Chart */}
-      <GmvCommissionChart data={chartData} />
+      <GmvCommissionChart data={chartData || []} />
 
       {/* Top Products */}
       <div className="space-y-4">

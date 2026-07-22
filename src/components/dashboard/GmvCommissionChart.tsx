@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -18,11 +19,11 @@ interface GmvCommissionChartProps {
   data: { date: string; gmv: number; commission: number }[];
 }
 
-export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
-  const formattedData = (data || []).map(item => ({
+export const GmvCommissionChart = memo(function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
+  const formattedData = useMemo(() => (data || []).map(item => ({
     ...item,
     dateFormatted: formatDateKeyShort(item.date),
-  }));
+  })), [data]);
 
   return (
     <div className="bg-card px-3 py-5 rounded-[18px] border border-border-main shadow-soft space-y-6">
@@ -59,4 +60,4 @@ export function GmvCommissionChart({ data = [] }: GmvCommissionChartProps) {
       </div>
     </div>
   );
-}
+});

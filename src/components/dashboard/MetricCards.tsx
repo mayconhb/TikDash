@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { Info } from 'lucide-react';
 import { formatCurrency, formatNumber } from '../../utils/formatters';
 
@@ -9,7 +9,7 @@ interface MetricCardProps {
   icon?: ReactNode;
 }
 
-export function StatusMetricCard({ title, count, color, icon }: MetricCardProps) {
+export const StatusMetricCard = memo(function StatusMetricCard({ title, count, color, icon }: MetricCardProps) {
   const colorMap: Record<string, string> = {
     yellow: 'text-status-pending',
     blue: 'text-status-awaiting',
@@ -41,9 +41,9 @@ export function StatusMetricCard({ title, count, color, icon }: MetricCardProps)
       </div>
     </div>
   );
-}
+});
 
-export function SummaryCard({ 
+export const SummaryCard = memo(function SummaryCard({ 
   gmvTotal, 
   commissionTotal, 
   gmvReal, 
@@ -104,4 +104,4 @@ export function SummaryCard({
       </div>
     </div>
   );
-}
+});

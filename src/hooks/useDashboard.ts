@@ -16,6 +16,8 @@ export function useDashboardSummary() {
     }),
     enabled: !!user,
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 }
 
@@ -32,6 +34,8 @@ export function useStatusSummary() {
     }),
     enabled: !!user,
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -48,6 +52,8 @@ export function useDashboardChart() {
     }),
     enabled: !!user,
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -64,6 +70,8 @@ export function useContentTypeComparison() {
     }),
     enabled: !!user,
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -96,6 +104,8 @@ export function useTopProducts() {
     }),
     enabled: !!user,
     placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
