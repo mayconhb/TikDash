@@ -136,26 +136,33 @@
   justify-content: space-between;
   padding: 0 0.5rem;
   pointer-events: none;
+  z-index: 10;
 }
 
-.rdp-nav_button {
+.rdp-nav button,
+.rdp-nav_button,
+.rdp-button_previous,
+.rdp-button_next {
   background-color: var(--color-background-secondary) !important;
   border: 1px solid var(--color-border-main) !important;
   border-radius: 8px !important;
   color: var(--color-text-secondary) !important;
-  width: 28px !important;
-  height: 28px !important;
+  width: 32px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 0 !important;
   transition: all 0.2s ease !important;
-  pointer-events: auto;
-  cursor: pointer;
-  z-index: 20;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 30 !important;
 }
 
-.rdp-nav_button:hover {
+.rdp-nav button:hover,
+.rdp-nav_button:hover,
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
   background-color: var(--color-background-main) !important;
   color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;

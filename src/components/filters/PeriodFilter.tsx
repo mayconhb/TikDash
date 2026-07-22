@@ -137,9 +137,14 @@ export function PeriodFilter({
                 numberOfMonths={1}
                 className="!m-0 rdp-custom"
                 showOutsideDays
+                classNames={{
+                  nav: "rdp-nav",
+                  button_previous: "rdp-nav_button_previous",
+                  button_next: "rdp-nav_button_next",
+                }}
                 components={{
-                  Chevron: (props) => {
-                    if (props.orientation === 'left') return <ChevronLeft className="h-4 w-4" />;
+                  Chevron: ({ orientation }) => {
+                    if (orientation === 'left') return <ChevronLeft className="h-4 w-4" />;
                     return <ChevronRight className="h-4 w-4" />;
                   }
                 }}
