@@ -7,10 +7,12 @@ import {
   UserRound,
   LogOut,
   Settings,
+  Download,
   CalendarDays
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { APP_CONFIG } from '../../config/app';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
 
 interface NavItemProps {
   to: string;
@@ -52,6 +54,7 @@ function DesktopNavItem({ to, icon: Icon, label, active }: NavItemProps) {
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { signOut, profile } = useAuth();
+  const { isInstallable, installPWA } = usePWAInstall();
   
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Início' },
@@ -66,9 +69,20 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background-main flex flex-col md:flex-row">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-[248px] bg-card border-r border-border-main sticky top-0 h-screen p-6 shadow-sm">
-        <div className="flex items-center space-x-2 mb-10 px-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold italic">T</div>
-          <span className="text-xl font-bold tracking-tight">{APP_CONFIG.name}</span>
+        <div className="flex items-center justify-between mb-10 px-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold italic">T</div>
+            <span className="text-xl font-bold tracking-tight">{APP_CONFIG.name}</span>
+          </div>
+          {isInstallable && (
+            <button 
+              onClick={installPWA}
+              className="p-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+              title="Instalar aplicativo"
+            >
+              <Download size={18} />
+            </button>
+          )}
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -103,6 +117,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xs italic">T</div>
             <span className="text-xl font-bold tracking-tight">{APP_CONFIG.name}</span>
+            {isInstallable && (
+              <button 
+                onClick={installPWA}
+                className="ml-2 p-1 bg-primary/10 text-primary rounded-md"
+              >
+                <Download size={16} />
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary-light rounded-full flex items-center justify-center text-primary font-bold text-xs">

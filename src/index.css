@@ -194,6 +194,23 @@
   body {
     @apply bg-background-main text-text-main font-sans;
     font-variant-numeric: tabular-nums;
+    /* Prevent pull-to-refresh on mobile for a more native feel */
+    overscroll-behavior-y: none;
+    /* Remove tap highlight color on mobile */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent text selection on UI elements for a native feel */
+  button, nav, header, aside {
+    user-select: none;
+  }
+
+  /* Optimize for standalone mode (PWA) */
+  @media (display-mode: standalone) {
+    body {
+      /* Padding for iOS home indicator if needed, though safe-areas usually handle it */
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }
 
