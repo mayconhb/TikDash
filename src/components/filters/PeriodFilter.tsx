@@ -14,7 +14,17 @@ const presets = [
   { id: 'last30days', label: '30 dias' },
 ] as const;
 
-export function PeriodFilter() {
+interface PeriodFilterProps {
+  showPresets?: boolean;
+  customLabel?: string;
+  showLabel?: boolean;
+}
+
+export function PeriodFilter({ 
+  showPresets = true, 
+  customLabel = 'Personalizado',
+  showLabel = true
+}: PeriodFilterProps) {
   const { period, setPreset, setCustomRange } = usePeriodFilter();
   const [showCustom, setShowCustom] = useState(false);
 
@@ -44,8 +54,8 @@ export function PeriodFilter() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-1 p-1 bg-background-secondary rounded-xl overflow-x-auto no-scrollbar whitespace-nowrap border border-border-main">
-          {presets.map((item) => (
+        <div className={`flex items-center gap-1 p-1 bg-background-secondary rounded-xl overflow-x-auto no-scrollbar whitespace-nowrap border border-border-main ${!showPresets ? 'w-full sm:w-auto' : ''}`}>
+          {showPresets && presets.map((item) => (
             <button
               key={item.id}
               onClick={() => setPreset(item.id)}
@@ -60,25 +70,32 @@ export function PeriodFilter() {
           ))}
           <button
             onClick={() => setShowCustom(true)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
+            className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200 flex items-center gap-2 ${!showPresets ? 'w-full justify-center py-3' : ''} ${
               period.preset === 'custom'
                 ? 'bg-primary text-white shadow-sm'
                 : 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
             }`}
           >
-            <Calendar size={16} />
-            Personalizado
+            <Calendar size={18} />
+            {customLabel}
+            {!showPresets && period.preset === 'custom' && (
+              <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs font-medium">
+                {period.label.replace('Exibindo: ', '')}
+              </span>
+            )}
           </button>
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 text-sm text-text-secondary animate-in fade-in duration-500">
-        <Calendar size={14} className="text-text-tertiary" />
-        <span>Exibindo:</span>
-        <span className="font-semibold text-text-primary">
-          {period.label}
-        </span>
-      </div>
+      {showLabel && (
+        <div className="flex items-center space-x-2 text-sm text-text-secondary animate-in fade-in duration-500">
+          <Calendar size={14} className="text-text-tertiary" />
+          <span>Exibindo:</span>
+          <span className="font-semibold text-text-primary">
+            {period.label}
+          </span>
+        </div>
+      )}
 
       {showCustom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">

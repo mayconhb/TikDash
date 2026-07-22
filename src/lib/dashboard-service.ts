@@ -572,6 +572,8 @@ export const dashboardService = {
             orders: new Set(), 
             gmv: 0, 
             commission: 0,
+            awaiting_commission: 0,
+            ineligible_commission: 0,
             settled: new Set(),
             pending: new Set(),
             awaiting: new Set(),
@@ -580,14 +582,23 @@ export const dashboardService = {
         }
         const d = dailyMap.get(dateKey)!;
         d.orders.add(row.order_id);
-        d.gmv += row.gmv;
-        d.commission += row.estimated_commission;
+        const gmvValue = Number(row.gmv || 0);
+        const commValue = Number(row.estimated_commission || 0);
+        
+        d.gmv += gmvValue;
+        d.commission += commValue;
         
         const s = row.normalized_settlement_status;
         if (s === 'settled') d.settled.add(row.order_id);
         else if (s === 'pending') d.pending.add(row.order_id);
-        else if (s === 'awaiting_payment') d.awaiting.add(row.order_id);
-        else if (s === 'ineligible') d.ineligible.add(row.order_id);
+        else if (s === 'awaiting_payment') {
+          d.awaiting.add(row.order_id);
+          d.awaiting_commission += commValue;
+        }
+        else if (s === 'ineligible') {
+          d.ineligible.add(row.order_id);
+          d.ineligible_commission += commValue;
+        }
       });
 
       return Array.from(dailyMap.values())
@@ -626,6 +637,8 @@ export const dashboardService = {
             orders: new Set(), 
             gmv: 0, 
             commission: 0,
+            awaiting_commission: 0,
+            ineligible_commission: 0,
             settled: new Set(),
             pending: new Set(),
             awaiting: new Set(),
@@ -634,14 +647,23 @@ export const dashboardService = {
         }
         const d = dailyMap.get(dateKey)!;
         d.orders.add(row.order_id);
-        d.gmv += Number(row.gmv || 0);
-        d.commission += Number(row.estimated_commission || 0);
+        const gmvValue = Number(row.gmv || 0);
+        const commValue = Number(row.estimated_commission || 0);
+        
+        d.gmv += gmvValue;
+        d.commission += commValue;
         
         const s = row.normalized_settlement_status;
         if (s === 'settled') d.settled.add(row.order_id);
         else if (s === 'pending') d.pending.add(row.order_id);
-        else if (s === 'awaiting_payment') d.awaiting.add(row.order_id);
-        else if (s === 'ineligible') d.ineligible.add(row.order_id);
+        else if (s === 'awaiting_payment') {
+          d.awaiting.add(row.order_id);
+          d.awaiting_commission += commValue;
+        }
+        else if (s === 'ineligible') {
+          d.ineligible.add(row.order_id);
+          d.ineligible_commission += commValue;
+        }
       });
 
       return Array.from(dailyMap.values())
