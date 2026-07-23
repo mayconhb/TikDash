@@ -17,6 +17,7 @@ import RelatorioDiario from './pages/RelatorioDiario';
 import Configuracoes from './pages/Configuracoes';
 import Onboarding from './pages/Onboarding';
 import Offline from './pages/Offline';
+import ProductSearch from './pages/ProductSearch';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,6 +93,16 @@ export default function App() {
               <PeriodFilterProvider>
                 <AppShell>
                   <Configuracoes />
+                </AppShell>
+              </PeriodFilterProvider>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/pesquisa" element={
+            <ProtectedRoute>
+              <PeriodFilterProvider>
+                <AppShell>
+                  <ProductSearch />
                 </AppShell>
               </PeriodFilterProvider>
             </ProtectedRoute>

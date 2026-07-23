@@ -1,8 +1,3 @@
-// Polyfill global if it's missing (required by some libraries)
-if (typeof window !== 'undefined' && typeof (window as any).global === 'undefined') {
-  (window as any).global = window;
-}
-
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import { Toaster } from 'sonner';

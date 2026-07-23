@@ -12,6 +12,23 @@ interface RangeParams {
   userId?: string;
 }
 
+// Helper for normalization (lowercase and remove accents)
+function normalizeString(str: string): string {
+  if (!str) return '';
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+// Generates a search pattern for SQL ILIKE that replaces vowels with % to be accent-insensitive
+function buildSQLSearchPattern(query: string): string {
+  const normalized = normalizeString(query);
+  // Replace vowels with % to catch any accented version in the database
+  return normalized.replace(/[aeiou]/g, '%');
+}
+
 export const dashboardService = {
   isDemo(userId?: string) {
     return userId === DEMO_USER_ID;
@@ -716,4 +733,138 @@ export const dashboardService = {
       return [];
     }
   },
+
+  async searchProducts(userId: string, query: string) {
+    if (!query || query.length < 2) return [];
+
+    const normalizedQuery = normalizeString(query);
+    const searchPattern = `%${buildSQLSearchPattern(query)}%`;
+
+    if (this.isDemo(userId)) {
+      const allRows = demoStorage.getRows(userId);
+      const uniqueNames = Array.from(new Set(allRows.map(r => r.product_name?.trim())))
+        .filter(name => name && normalizeString(name).includes(normalizedQuery))
+        .slice(0, 15);
+      return uniqueNames;
+    }
+
+    // Use ilike with % wildcards for vowels to find accented versions
+    const { data, error } = await supabase
+      .from('affiliate_order_rows')
+      .select('product_name')
+      .eq('user_id', userId)
+      .ilike('product_name', searchPattern)
+      .order('order_date', { ascending: false })
+      .limit(2000);
+
+    if (error) {
+      console.error('Error searching products:', error);
+      return [];
+    }
+    
+    // JS side accent-insensitive and case-insensitive deduplication
+    const names = data.map(d => d.product_name?.trim()).filter(Boolean);
+    const seen = new Set<string>();
+    const unique: string[] = [];
+
+    for (const name of names) {
+      const norm = normalizeString(name);
+      // Ensure the result actually matches our normalized query (finer grain than SQL)
+      if (norm.includes(normalizedQuery) && !seen.has(norm)) {
+        seen.add(norm);
+        unique.push(name);
+      }
+      if (unique.length >= 15) break;
+    }
+
+    return unique;
+  },
+
+  async getProductAnalytics(userId: string, productNames: string[], startUtc: string, endUtcExclusive: string) {
+    if (!productNames || productNames.length === 0) return null;
+
+    let rows: any[] = [];
+    const normalizedTargets = productNames.map(name => normalizeString(name));
+    
+    if (this.isDemo(userId)) {
+      rows = demoStorage.getRows(userId, startUtc, endUtcExclusive)
+        .filter(r => normalizedTargets.includes(normalizeString(r.product_name || '')));
+    } else {
+      // Fetch all rows for the period and filter in JS for maximum reliability with complex names and selection
+      let allRows: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      
+      while (true) {
+        const { data, error } = await supabase
+          .from('affiliate_order_rows')
+          .select('gmv, estimated_commission, order_id, normalized_settlement_status, product_name, order_date')
+          .eq('user_id', userId)
+          .gte('order_date', startUtc)
+          .lt('order_date', endUtcExclusive)
+          .range(from, from + pageSize - 1);
+        
+        if (error) {
+          console.error('Error fetching product analytics rows:', error);
+          throw error;
+        }
+        if (!data || data.length === 0) break;
+        
+        allRows.push(...data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      
+      // Filter in JS using our robust normalization logic (handles accents/case/etc)
+      rows = allRows.filter(r => {
+        const norm = normalizeString(r.product_name || '');
+        return normalizedTargets.includes(norm);
+      });
+    }
+
+    const analytics: any = {
+      productNames,
+      totalOrders: new Set(rows.map(r => r.order_id)).size,
+      pending: { count: 0, gmv: 0, commission: 0 },
+      awaiting_payment: { count: 0, gmv: 0, commission: 0 },
+      ineligible: { count: 0, gmv: 0, commission: 0 },
+      settled: { count: 0, gmv: 0, commission: 0 },
+      totalGmvReal: 0,
+      totalCommissionReal: 0
+    };
+
+    const statusOrders = {
+      pending: new Set<string>(),
+      awaiting_payment: new Set<string>(),
+      ineligible: new Set<string>(),
+      settled: new Set<string>()
+    };
+
+    rows.forEach(r => {
+      const gmv = Number(r.gmv || 0);
+      const commission = Number(r.estimated_commission || 0);
+      // Ensure status is lowercased to match our analytics keys
+      const rawStatus = (r.normalized_settlement_status || 'unknown').toLowerCase();
+      const status = rawStatus as keyof typeof statusOrders;
+
+      if (status === 'settled' || status === 'pending') {
+        analytics.totalGmvReal += gmv;
+        analytics.totalCommissionReal += commission;
+      }
+
+      if (analytics[status]) {
+        analytics[status].gmv += gmv;
+        analytics[status].commission += commission;
+        statusOrders[status].add(r.order_id);
+      }
+    });
+
+    analytics.pending.count = statusOrders.pending.size;
+    analytics.awaiting_payment.count = statusOrders.awaiting_payment.size;
+    analytics.ineligible.count = statusOrders.ineligible.size;
+    analytics.settled.count = statusOrders.settled.size;
+
+    return analytics;
+  }
+
 };

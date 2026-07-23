@@ -8,7 +8,8 @@ import {
   LogOut,
   Settings,
   Download,
-  CalendarDays
+  CalendarDays,
+  Search
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { APP_CONFIG } from '../../config/app';
@@ -59,6 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Início' },
     { to: '/relatorio-diario', icon: CalendarDays, label: 'Diário' },
+    { to: '/pesquisa', icon: Search, label: 'Pesquisa' },
     { to: '/importacoes', icon: FileUp, label: 'Importações' },
     { to: '/configuracoes', icon: Settings, label: 'Conta' },
   ];

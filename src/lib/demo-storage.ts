@@ -18,15 +18,17 @@ export const demoStorage = {
     return record;
   },
 
-  getRows: (userId: string, startUtc: string, endUtcExclusive: string): AffiliateOrderRow[] => {
+  getRows: (userId: string, startUtc?: string, endUtcExclusive?: string): AffiliateOrderRow[] => {
     const data = localStorage.getItem(STORAGE_KEYS.ROWS);
     if (!data) return [];
     
     const rows: AffiliateOrderRow[] = JSON.parse(data);
     return rows.filter(row => {
-      return row.user_id === userId && 
-             row.order_date >= startUtc && 
-             row.order_date < endUtcExclusive;
+      const matchesUser = row.user_id === userId;
+      if (!matchesUser) return false;
+      if (startUtc && row.order_date < startUtc) return false;
+      if (endUtcExclusive && row.order_date >= endUtcExclusive) return false;
+      return true;
     });
   },
 

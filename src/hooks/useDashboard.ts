@@ -156,3 +156,31 @@ export function useDailyReport() {
     placeholderData: keepPreviousData,
   });
 }
+
+export function useProductSearch(query: string) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['product-search', user?.id, query],
+    queryFn: () => dashboardService.searchProducts(user?.id || '', query),
+    enabled: !!user && query.length >= 2,
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+}
+
+export function useProductAnalytics(productNames: string[]) {
+  const { period } = usePeriodFilter();
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['product-analytics', user?.id, productNames, period.startUtc, period.endUtcExclusive],
+    queryFn: () => dashboardService.getProductAnalytics(
+      user?.id || '',
+      productNames,
+      period.startUtc,
+      period.endUtcExclusive
+    ),
+    enabled: !!user && productNames.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+}
