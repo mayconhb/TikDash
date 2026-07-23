@@ -88,13 +88,11 @@ export const dashboardService = {
         commissionTotal: 0,
         ordersCount: 0,
       };
-      const uniqueOrders = new Set<string>();
       rows.forEach(r => {
         summary.gmvTotal += r.gmv;
         summary.commissionTotal += r.estimated_commission;
-        uniqueOrders.add(r.order_id);
+        summary.ordersCount += 1;
       });
-      summary.ordersCount = uniqueOrders.size;
       return { ...summary, hasAnyData, lastUpdate };
     }
 
@@ -151,13 +149,11 @@ export const dashboardService = {
         commissionTotal: 0,
         ordersCount: 0,
       };
-      const uniqueOrders = new Set<string>();
       rows.forEach(r => {
         summary.gmvTotal += Number(r.gmv || 0);
         summary.commissionTotal += Number(r.estimated_commission || 0);
-        uniqueOrders.add(r.order_id);
+        summary.ordersCount += 1;
       });
-      summary.ordersCount = uniqueOrders.size;
       return { ...summary, hasAnyData, lastUpdate };
     } catch (e) {
       console.error('Fallback getSummary failed:', e);
@@ -174,18 +170,15 @@ export const dashboardService = {
         awaiting_payment: { count: 0, gmv: 0, commission: 0 },
         ineligible: { count: 0, gmv: 0, commission: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const status = r.normalized_settlement_status;
         if (metrics[status]) {
-          if (!uniqueOrders.has(status)) uniqueOrders.set(status, new Set());
-          uniqueOrders.get(status)!.add(r.order_id);
+          metrics[status].count += 1;
           metrics[status].gmv += r.gmv;
           metrics[status].commission += r.estimated_commission;
         }
       });
-      Object.keys(metrics).forEach(s => metrics[s].count = uniqueOrders.get(s)?.size || 0);
       return metrics;
     }
 
@@ -210,18 +203,15 @@ export const dashboardService = {
         awaiting_payment: { count: 0, gmv: 0, commission: 0 },
         ineligible: { count: 0, gmv: 0, commission: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const status = r.normalized_settlement_status;
         if (metrics[status]) {
-          if (!uniqueOrders.has(status)) uniqueOrders.set(status, new Set());
-          uniqueOrders.get(status)!.add(r.order_id);
+          metrics[status].count += 1;
           metrics[status].gmv += Number(r.gmv || 0);
           metrics[status].commission += Number(r.estimated_commission || 0);
         }
       });
-      Object.keys(metrics).forEach(s => metrics[s].count = uniqueOrders.get(s)?.size || 0);
       return metrics;
     } catch (e) {
       console.error('Fallback getStatusMetrics failed:', e);
@@ -295,13 +285,11 @@ export const dashboardService = {
         live: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
         other: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const content = r.content_type_normalized || 'other';
         if (stats[content]) {
-          if (!uniqueOrders.has(content)) uniqueOrders.set(content, new Set());
-          uniqueOrders.get(content)!.add(r.order_id);
+          stats[content].orders += 1;
           const gmvVal = Number(r.gmv || 0);
           const commVal = Number(r.estimated_commission || 0);
           
@@ -314,7 +302,6 @@ export const dashboardService = {
           }
         }
       });
-      Object.keys(stats).forEach(c => stats[c].orders = uniqueOrders.get(c)?.size || 0);
       return stats;
     }
 
@@ -351,13 +338,11 @@ export const dashboardService = {
         live: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
         other: { orders: 0, gmv: 0, commission: 0, gmvReal: 0, commissionReal: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const content = r.content_type_normalized || 'other';
         const key = stats[content] ? content : 'other';
-        if (!uniqueOrders.has(key)) uniqueOrders.set(key, new Set());
-        uniqueOrders.get(key)!.add(r.order_id);
+        stats[key].orders += 1;
         
         const gmvVal = Number(r.gmv || 0);
         const commVal = Number(r.estimated_commission || 0);
@@ -370,7 +355,6 @@ export const dashboardService = {
           stats[key].commissionReal += commVal;
         }
       });
-      Object.keys(stats).forEach(c => stats[c].orders = uniqueOrders.get(c)?.size || 0);
       return stats;
     } catch (e) {
       console.error('Fallback getContentTypeComparison failed:', e);
@@ -390,18 +374,15 @@ export const dashboardService = {
         shop_ads: { orders: 0, gmv: 0, commission: 0 },
         unknown: { orders: 0, gmv: 0, commission: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const traffic = r.traffic_source || 'unknown';
         if (stats[traffic]) {
-          if (!uniqueOrders.has(traffic)) uniqueOrders.set(traffic, new Set());
-          uniqueOrders.get(traffic)!.add(r.order_id);
+          stats[traffic].orders += 1;
           stats[traffic].gmv += r.gmv;
           stats[traffic].commission += r.estimated_commission;
         }
       });
-      Object.keys(stats).forEach(t => stats[t].orders = uniqueOrders.get(t)?.size || 0);
       return stats;
     }
 
@@ -424,17 +405,14 @@ export const dashboardService = {
         shop_ads: { orders: 0, gmv: 0, commission: 0 },
         unknown: { orders: 0, gmv: 0, commission: 0 },
       };
-      const uniqueOrders = new Map<string, Set<string>>();
 
       rows.forEach(r => {
         const traffic = r.traffic_source || 'unknown';
         const key = stats[traffic] ? traffic : 'unknown';
-        if (!uniqueOrders.has(key)) uniqueOrders.set(key, new Set());
-        uniqueOrders.get(key)!.add(r.order_id);
+        stats[key].orders += 1;
         stats[key].gmv += Number(r.gmv || 0);
         stats[key].commission += Number(r.estimated_commission || 0);
       });
-      Object.keys(stats).forEach(t => stats[t].orders = uniqueOrders.get(t)?.size || 0);
       return stats;
     } catch (e) {
       console.error('Fallback getTrafficSourceComparison failed:', e);
@@ -454,17 +432,16 @@ export const dashboardService = {
       rows.forEach(row => {
         const prodId = row.product_id || row.product_name;
         if (!productsMap.has(prodId)) {
-          productsMap.set(prodId, { id: prodId, name: row.product_name, sold: 0, orders: new Set(), gmv: 0, commission: 0 });
+          productsMap.set(prodId, { id: prodId, name: row.product_name, sold: 0, orders: 0, gmv: 0, commission: 0 });
         }
         const p = productsMap.get(prodId)!;
         p.sold += row.items_sold;
-        p.orders.add(row.order_id);
+        p.orders += 1;
         p.gmv += row.gmv;
         p.commission += row.estimated_commission;
       });
 
       return Array.from(productsMap.values())
-        .map(p => ({ ...p, orders: p.orders.size }))
         .sort((a, b) => b.sold - a.sold)
         .slice(0, 10);
     }
@@ -487,17 +464,16 @@ export const dashboardService = {
       rows.forEach(row => {
         const prodId = row.product_id || row.product_name;
         if (!productsMap.has(prodId)) {
-          productsMap.set(prodId, { id: prodId, name: row.product_name, sold: 0, orders: new Set(), gmv: 0, commission: 0 });
+          productsMap.set(prodId, { id: prodId, name: row.product_name, sold: 0, orders: 0, gmv: 0, commission: 0 });
         }
         const p = productsMap.get(prodId)!;
         p.sold += Number(row.items_sold || 0);
-        p.orders.add(row.order_id);
+        p.orders += 1;
         p.gmv += Number(row.gmv || 0);
         p.commission += Number(row.estimated_commission || 0);
       });
 
       return Array.from(productsMap.values())
-        .map(p => ({ ...p, orders: p.orders.size }))
         .sort((a, b) => b.sold - a.sold)
         .slice(0, 10);
     } catch (e) {
@@ -510,17 +486,13 @@ export const dashboardService = {
     if (this.isDemo(params.userId)) {
       const rows = demoStorage.getRows(params.userId!, params.startUtc, params.endUtcExclusive);
       const hours = Array.from({ length: 24 }, (_, i) => ({ hour: i, orders: 0, gmv: 0, commission: 0 }));
-      const uniqueOrders = new Map<number, Set<string>>();
-
       rows.forEach(r => {
         const localDate = toZonedTime(new Date(r.order_date), APP_TIME_ZONE);
         const hour = localDate.getHours();
-        if (!uniqueOrders.has(hour)) uniqueOrders.set(hour, new Set());
-        uniqueOrders.get(hour)!.add(r.order_id);
+        hours[hour].orders += 1;
         hours[hour].gmv += r.gmv;
         hours[hour].commission += r.estimated_commission;
       });
-      hours.forEach(h => h.orders = uniqueOrders.get(h.hour)?.size || 0);
       return hours;
     }
 
@@ -539,16 +511,13 @@ export const dashboardService = {
     try {
       const rows = await this.getAllRows('gmv, estimated_commission, order_id, order_date', params);
       const hours = Array.from({ length: 24 }, (_, i) => ({ hour: i, orders: 0, gmv: 0, commission: 0 }));
-      const uniqueOrders = new Map<number, Set<string>>();
       rows.forEach(r => {
         const localDate = toZonedTime(new Date(r.order_date), APP_TIME_ZONE);
         const hour = localDate.getHours();
-        if (!uniqueOrders.has(hour)) uniqueOrders.set(hour, new Set());
-        uniqueOrders.get(hour)!.add(r.order_id);
+        hours[hour].orders += 1;
         hours[hour].gmv += Number(r.gmv || 0);
         hours[hour].commission += Number(r.estimated_commission || 0);
       });
-      hours.forEach(h => h.orders = uniqueOrders.get(h.hour)?.size || 0);
       return hours;
     } catch (e) {
       console.error('Fallback getSalesByHour failed:', e);
@@ -560,17 +529,13 @@ export const dashboardService = {
     if (this.isDemo(params.userId)) {
       const rows = demoStorage.getRows(params.userId!, params.startUtc, params.endUtcExclusive);
       const days = Array.from({ length: 7 }, (_, i) => ({ day: i, orders: 0, gmv: 0, commission: 0 }));
-      const uniqueOrders = new Map<number, Set<string>>();
-
       rows.forEach(r => {
         const localDate = toZonedTime(new Date(r.order_date), APP_TIME_ZONE);
         const day = localDate.getDay();
-        if (!uniqueOrders.has(day)) uniqueOrders.set(day, new Set());
-        uniqueOrders.get(day)!.add(r.order_id);
+        days[day].orders += 1;
         days[day].gmv += r.gmv;
         days[day].commission += r.estimated_commission;
       });
-      days.forEach(d => d.orders = uniqueOrders.get(d.day)?.size || 0);
       return days;
     }
 
@@ -589,16 +554,13 @@ export const dashboardService = {
     try {
       const rows = await this.getAllRows('gmv, estimated_commission, order_id, order_date', params);
       const days = Array.from({ length: 7 }, (_, i) => ({ day: i, orders: 0, gmv: 0, commission: 0 }));
-      const uniqueOrders = new Map<number, Set<string>>();
       rows.forEach(r => {
         const localDate = toZonedTime(new Date(r.order_date), APP_TIME_ZONE);
         const day = localDate.getDay();
-        if (!uniqueOrders.has(day)) uniqueOrders.set(day, new Set());
-        uniqueOrders.get(day)!.add(r.order_id);
+        days[day].orders += 1;
         days[day].gmv += Number(r.gmv || 0);
         days[day].commission += Number(r.estimated_commission || 0);
       });
-      days.forEach(d => d.orders = uniqueOrders.get(d.day)?.size || 0);
       return days;
     } catch (e) {
       console.error('Fallback getSalesByWeekday failed:', e);
@@ -617,19 +579,19 @@ export const dashboardService = {
         if (!dailyMap.has(dateKey)) {
           dailyMap.set(dateKey, { 
             date: dateKey, 
-            orders: new Set(), 
+            orders: 0, 
             gmv: 0, 
             commission: 0,
             awaiting_commission: 0,
             ineligible_commission: 0,
-            settled: new Set(),
-            pending: new Set(),
-            awaiting: new Set(),
-            ineligible: new Set()
+            settled: 0,
+            pending: 0,
+            awaiting: 0,
+            ineligible: 0
           });
         }
         const d = dailyMap.get(dateKey)!;
-        d.orders.add(row.order_id);
+        d.orders += 1;
         const gmvValue = Number(row.gmv || 0) || 0;
         const commValue = Number(row.estimated_commission || 0) || 0;
         
@@ -639,27 +601,19 @@ export const dashboardService = {
           d.commission += commValue;
         }
         
-        if (s === 'settled') d.settled.add(row.order_id);
-        else if (s === 'pending') d.pending.add(row.order_id);
+        if (s === 'settled') d.settled += 1;
+        else if (s === 'pending') d.pending += 1;
         else if (s === 'awaiting_payment') {
-          d.awaiting.add(row.order_id);
+          d.awaiting += 1;
           d.awaiting_commission += commValue;
         }
         else if (s === 'ineligible') {
-          d.ineligible.add(row.order_id);
+          d.ineligible += 1;
           d.ineligible_commission += commValue;
         }
       });
 
       return Array.from(dailyMap.values())
-        .map(d => ({ 
-          ...d, 
-          orders: d.orders.size,
-          settled: d.settled.size,
-          pending: d.pending.size,
-          awaiting: d.awaiting.size,
-          ineligible: d.ineligible.size
-        }))
         .sort((a, b) => b.date.localeCompare(a.date));
     }
 
@@ -684,19 +638,19 @@ export const dashboardService = {
         if (!dailyMap.has(dateKey)) {
           dailyMap.set(dateKey, { 
             date: dateKey, 
-            orders: new Set(), 
+            orders: 0, 
             gmv: 0, 
             commission: 0,
             awaiting_commission: 0,
             ineligible_commission: 0,
-            settled: new Set(),
-            pending: new Set(),
-            awaiting: new Set(),
-            ineligible: new Set()
+            settled: 0,
+            pending: 0,
+            awaiting: 0,
+            ineligible: 0
           });
         }
         const d = dailyMap.get(dateKey)!;
-        d.orders.add(row.order_id);
+        d.orders += 1;
         const gmvValue = Number(row.gmv || 0) || 0;
         const commValue = Number(row.estimated_commission || 0) || 0;
         
@@ -706,27 +660,19 @@ export const dashboardService = {
           d.commission += commValue;
         }
         
-        if (s === 'settled') d.settled.add(row.order_id);
-        else if (s === 'pending') d.pending.add(row.order_id);
+        if (s === 'settled') d.settled += 1;
+        else if (s === 'pending') d.pending += 1;
         else if (s === 'awaiting_payment') {
-          d.awaiting.add(row.order_id);
+          d.awaiting += 1;
           d.awaiting_commission += commValue;
         }
         else if (s === 'ineligible') {
-          d.ineligible.add(row.order_id);
+          d.ineligible += 1;
           d.ineligible_commission += commValue;
         }
       });
 
       return Array.from(dailyMap.values())
-        .map(d => ({ 
-          ...d, 
-          orders: d.orders.size,
-          settled: d.settled.size,
-          pending: d.pending.size,
-          awaiting: d.awaiting.size,
-          ineligible: d.ineligible.size
-        }))
         .sort((a, b) => b.date.localeCompare(a.date));
     } catch (e) {
       console.error('Fallback getDailyReport failed:', e);
@@ -824,7 +770,7 @@ export const dashboardService = {
 
     const analytics: any = {
       productNames,
-      totalOrders: new Set(rows.map(r => r.order_id)).size,
+      totalOrders: rows.length, // Count all items/rows
       pending: { count: 0, gmv: 0, commission: 0 },
       awaiting_payment: { count: 0, gmv: 0, commission: 0 },
       ineligible: { count: 0, gmv: 0, commission: 0 },
@@ -833,19 +779,11 @@ export const dashboardService = {
       totalCommissionReal: 0
     };
 
-    const statusOrders = {
-      pending: new Set<string>(),
-      awaiting_payment: new Set<string>(),
-      ineligible: new Set<string>(),
-      settled: new Set<string>()
-    };
-
     rows.forEach(r => {
       const gmv = Number(r.gmv || 0);
       const commission = Number(r.estimated_commission || 0);
       // Ensure status is lowercased to match our analytics keys
-      const rawStatus = (r.normalized_settlement_status || 'unknown').toLowerCase();
-      const status = rawStatus as keyof typeof statusOrders;
+      const status = (r.normalized_settlement_status || 'unknown').toLowerCase();
 
       if (status === 'settled' || status === 'pending') {
         analytics.totalGmvReal += gmv;
@@ -855,14 +793,9 @@ export const dashboardService = {
       if (analytics[status]) {
         analytics[status].gmv += gmv;
         analytics[status].commission += commission;
-        statusOrders[status].add(r.order_id);
+        analytics[status].count += 1; // Count each row
       }
     });
-
-    analytics.pending.count = statusOrders.pending.size;
-    analytics.awaiting_payment.count = statusOrders.awaiting_payment.size;
-    analytics.ineligible.count = statusOrders.ineligible.size;
-    analytics.settled.count = statusOrders.settled.size;
 
     return analytics;
   }

@@ -103,26 +103,27 @@ export default function ProductSearch() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Period Filter */}
-      <PeriodFilter />
-
       {/* Search Header */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-black text-text-main tracking-tight">Pesquisa de Produtos</h1>
-            <p className="text-text-secondary text-sm">Selecione um ou mais produtos para análise combinada</p>
-          </div>
-          {selectedProducts.length > 0 && (
-            <button 
-              onClick={clearAll}
-              className="text-[11px] font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              Limpar Tudo
-            </button>
-          )}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-text-main tracking-tight">Pesquisa de Produtos</h1>
+          <p className="text-text-secondary text-sm">Selecione um ou mais produtos para análise combinada</p>
         </div>
+        {selectedProducts.length > 0 && (
+          <button 
+            onClick={clearAll}
+            className="text-[11px] font-black text-rose-500 uppercase tracking-widest hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Limpar Tudo
+          </button>
+        )}
+      </div>
 
+      {/* Period Filter */}
+      <PeriodFilter showPresets={false} customLabel="Filtrar Dias" showLabel={false} />
+
+      {/* Search Input Area */}
+      <div className="space-y-4">
         <div className="relative" ref={suggestionsRef}>
           <div className="relative group">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">

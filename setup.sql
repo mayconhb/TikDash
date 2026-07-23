@@ -155,7 +155,7 @@ BEGIN
   SELECT 
     COALESCE(SUM(gmv), 0) as gmv_total,
     COALESCE(SUM(estimated_commission), 0) as commission_total,
-    COUNT(DISTINCT order_id) as orders_count
+    COUNT(*) as orders_count
   FROM public.affiliate_order_rows
   WHERE user_id = auth.uid()
     AND order_date >= p_start_at
@@ -172,7 +172,7 @@ BEGIN
   WITH metrics AS (
     SELECT 
       normalized_settlement_status as status,
-      COUNT(DISTINCT order_id) as count,
+      COUNT(*) as count,
       SUM(gmv) as gmv,
       SUM(estimated_commission) as commission
     FROM public.affiliate_order_rows
@@ -230,7 +230,7 @@ BEGIN
   WITH stats AS (
     SELECT 
       COALESCE(content_type_normalized, 'other') as content,
-      COUNT(DISTINCT order_id) as orders,
+      COUNT(*) as orders,
       SUM(gmv) as gmv,
       SUM(estimated_commission) as commission
     FROM public.affiliate_order_rows
@@ -267,7 +267,7 @@ BEGIN
   WITH stats AS (
     SELECT 
       COALESCE(traffic_source, 'unknown') as traffic,
-      COUNT(DISTINCT order_id) as orders,
+      COUNT(*) as orders,
       SUM(gmv) as gmv,
       SUM(estimated_commission) as commission
     FROM public.affiliate_order_rows
@@ -304,7 +304,7 @@ BEGIN
     COALESCE(product_id, product_name) as id,
     product_name as name,
     SUM(items_sold)::BIGINT as sold,
-    COUNT(DISTINCT order_id)::BIGINT as orders,
+    COUNT(*)::BIGINT as orders,
     COALESCE(SUM(gmv), 0) as gmv,
     COALESCE(SUM(estimated_commission), 0) as commission
   FROM public.affiliate_order_rows
@@ -324,7 +324,7 @@ BEGIN
   RETURN QUERY
   SELECT 
     EXTRACT(HOUR FROM order_date AT TIME ZONE 'America/Sao_Paulo')::INT as hour,
-    COUNT(DISTINCT order_id)::BIGINT as orders,
+    COUNT(*)::BIGINT as orders,
     COALESCE(SUM(gmv), 0) as gmv,
     COALESCE(SUM(estimated_commission), 0) as commission
   FROM public.affiliate_order_rows
@@ -343,7 +343,7 @@ BEGIN
   RETURN QUERY
   SELECT 
     EXTRACT(DOW FROM order_date AT TIME ZONE 'America/Sao_Paulo')::INT as day,
-    COUNT(DISTINCT order_id)::BIGINT as orders,
+    COUNT(*)::BIGINT as orders,
     COALESCE(SUM(gmv), 0) as gmv,
     COALESCE(SUM(estimated_commission), 0) as commission
   FROM public.affiliate_order_rows
@@ -362,13 +362,13 @@ BEGIN
   RETURN QUERY
   SELECT 
     TO_CHAR(order_date AT TIME ZONE 'America/Sao_Paulo', 'YYYY-MM-DD') as date,
-    COUNT(DISTINCT order_id)::BIGINT as orders,
+    COUNT(*)::BIGINT as orders,
     COALESCE(SUM(gmv), 0) as gmv,
     COALESCE(SUM(estimated_commission), 0) as commission,
-    COUNT(DISTINCT CASE WHEN normalized_settlement_status = 'settled' THEN order_id END)::BIGINT as settled,
-    COUNT(DISTINCT CASE WHEN normalized_settlement_status = 'pending' THEN order_id END)::BIGINT as pending,
-    COUNT(DISTINCT CASE WHEN normalized_settlement_status = 'awaiting_payment' THEN order_id END)::BIGINT as awaiting,
-    COUNT(DISTINCT CASE WHEN normalized_settlement_status = 'ineligible' THEN order_id END)::BIGINT as ineligible
+    COUNT(*) FILTER (WHERE normalized_settlement_status = 'settled')::BIGINT as settled,
+    COUNT(*) FILTER (WHERE normalized_settlement_status = 'pending')::BIGINT as pending,
+    COUNT(*) FILTER (WHERE normalized_settlement_status = 'awaiting_payment')::BIGINT as awaiting,
+    COUNT(*) FILTER (WHERE normalized_settlement_status = 'ineligible')::BIGINT as ineligible
   FROM public.affiliate_order_rows
   WHERE user_id = auth.uid()
     AND order_date >= p_start_at
